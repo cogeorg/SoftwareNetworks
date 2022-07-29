@@ -88,7 +88,8 @@ def tokenize(v1):
             token = int(float(token))
             _tokens.append(token)
         except:
-            print("   <<< ERROR: " + token)
+            if False:
+                print("   <<< ERROR TOKENIZE: " + token)
 
     return _tokens
 
@@ -173,14 +174,16 @@ def compare_versions(v1, versions, comp):
 # -------------------------------------------------------------------------
 def find_matches(versions, from_id, from_version, dep_req, dep_id):
     matches = []
+    
+    # dep_id = int(float(dep_id))
 
-    dep_id = int(float(dep_id))
     try:
         # exact matches
         if True:
             if dep_req in versions[dep_id]:
+                # print(dep_req, dep_id, versions[dep_id])
                 matches.append(dep_req)
-
+            
         # wildcard matches
         if True: # Most packages seem to just use * for dependencies, creating a *lot* of edges. Hence, this part is optional
             if dep_req == "x" or dep_req == "*":
@@ -207,7 +210,7 @@ def find_matches(versions, from_id, from_version, dep_req, dep_id):
 
     except KeyError:
         if False:  # error logging
-            print("   << ERROR: " + str(dep_id))
+            print("   << KEY ERROR: " + str(dep_req))
 
     return matches
 
@@ -216,6 +219,7 @@ def find_matches(versions, from_id, from_version, dep_req, dep_id):
 # -------------------------------------------------------------------------
 def do_run(base_directory, input_file_name, output_file_name, version_file_name):
     line_count = 0
+    error_count = 0
 
     G = nx.DiGraph()
 
@@ -228,21 +232,34 @@ def do_run(base_directory, input_file_name, output_file_name, version_file_name)
             line_count += 1
             tokens = line.strip().split(",")
 
-            from_id = int(tokens[1])
-            from_version = tokens[3]
+            if len(tokens) == 7:
+                try:
+                    from_id = int(tokens[1])
+                except ValueError:
+                    print("  <<  VALUE ERROR:", tokens)
+    
+                from_version = tokens[3]
 
-            if len(tokens) > 5: 
-                if tokens[5] != "":
-                    to_id = int(float(tokens[5]))
-                    matches = find_matches(versions, from_id, from_version, tokens[4], to_id)
-                if len(matches) > 0:
-                    from_node = str(from_id) + "-" + from_version
-                    for match in matches:
-                        to_node = str(to_id) + "-" + match
-                        G.add_edge(from_node, to_node)
+                # if len(tokens) > 5:
+                try:
+                    if tokens[5] != "":
+                        to_id = int(float(tokens[5]))
+                        matches = find_matches(versions, from_id, from_version, tokens[4], to_id)
+                        if len(matches) > 0:
+                            from_node = str(from_id) + "-" + from_version
+                            for match in matches:
+                                to_node = str(to_id) + "-" + match
+                                G.add_edge(from_node, to_node)
+                    else:
+                        error_count += 1
+                        # print("  << TOKEN ERROR:", len(tokens), tokens)
+                except IndexError:
+                    print("  << INDEX ERROR: ", len(tokens), tokens)
+            else:
+                print("    << WARNING TOKEN LENGTH:", len(tokens), tokens)
 
     if True:  # debugging
-        print("    >>> G: # Nodes: " + str(len(G.nodes())) + " # Edges: " + str(len(G.edges())))
+        print("    >>> G: # Nodes: " + str(len(G.nodes())) + " # Edges: " + str(len(G.edges())) + " WITH: " + str(error_count) + " ERRORS.")
 
     nx.write_gexf(G, base_directory + output_file_name)
     print("    >>> FILE WRITTEN TO:" + base_directory + output_file_name)
