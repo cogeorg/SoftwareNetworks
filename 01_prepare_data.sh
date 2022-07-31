@@ -1,5 +1,48 @@
-#!/usr/bin/env bash
-BASEDIR = ~\Dropbox\Papers\10_WorkInProgress\SoftwareNetworks\Data\
+#!/usr/bin/bash
+BASEDIR=/c/Users/user-pc/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/libraries-1.4.0-2018-12-22/
+BASENAME=test1
+DEPFILE=dependencies_$BASENAME.csv
+
+# ###########################################################################
+#
+# TEST RUN
+#
+# ###########################################################################
+
+#
+# STEP 1 -- NOT NECESSARY SINCE INPUT FILES ARE MANUALLY PREPARED
+#
+
+#
+# STEP 2
+#
+# execute in data directory...
+# cd $BASEDIR ; split -l 100000 -d -a 5 $DEPFILE  ; mv x* dependencies/ ; cd dependencies ; for i in `ls` ; do mv $i $i.csv ; done ; cd ..
+
+# ...then execute in this directory:
+# ./20_merge_data.py \
+#   $BASEDIR/ \
+#   dependencies/ \
+#   dependencies_restricted/ \
+#   $BASENAME
+
+# cd $BASEDIR/dependencies_restricted/ ; \
+#     rm ../dependencies_$BASENAME-merged.csv 2>/dev/null ; \
+#     cat *.csv | grep -v "Project ID,Pro" >> ../dependencies_$BASENAME-merged.csv ; \
+#     cd -
+
+./30_create_dependency_graph.py \
+  $BASEDIR/ \
+  dependencies_$BASENAME-merged.csv \
+  dependencies_$BASENAME-merged.gexf \
+  versions_$BASENAME-restricted.csv
+
+
+# ###########################################################################
+#
+# PRODUCTION RUN
+#
+# ###########################################################################
 
 #
 # STEP 1 -- PREPARE ORIGINAL DATA
@@ -10,7 +53,7 @@ BASEDIR = ~\Dropbox\Papers\10_WorkInProgress\SoftwareNetworks\Data\
 # ./10_prepare_dependencies.py \
 #   $BASEDIR/libraries-1.4.0-2018-12-22/ \
 #   dependencies-1.4.0-2018-12-22.csv \
-#   dependencies_npm.csv
+#   $DEPFILE
 
 # ./11_prepare_projects.py \
 #   $BASEDIR/libraries-1.4.0-2018-12-22/ \
@@ -21,14 +64,14 @@ BASEDIR = ~\Dropbox\Papers\10_WorkInProgress\SoftwareNetworks\Data\
 #   $BASEDIR/libraries-1.4.0-2018-12-22/ \
 #   versions-1.4.0-2018-12-22.csv \
 #   versions_npm-restricted.csv \
-#   2010-12-18 \
+#   2011-01-01 \
 #   2021-12-31
 
 #
 # STEP 2
 #
 # execute in data directory...
-# cd $BASEDIR/libraries-1.4.0-2018-12-22/ ; split -l 100000 -d -a 5 dependencies_npm.csv  ; mv x* dependencies/ ; cd dependencies ; for i in `ls` ; do mv $i $i.csv ; done ; cd ..
+# cd $BASEDIR/libraries-1.4.0-2018-12-22/ ; split -l 100000 -d -a 5 $DEPFILE  ; mv x* dependencies/ ; cd dependencies ; for i in `ls` ; do mv $i $i.csv ; done ; cd ..
 
 # ...then execute in this directory:
 # ./20_merge_data.py \
@@ -36,11 +79,13 @@ BASEDIR = ~\Dropbox\Papers\10_WorkInProgress\SoftwareNetworks\Data\
 #   dependencies/ \
 #   dependencies_restricted/
 
-# cd $BASEDIR/libraries-1.4.0-2018-12-22/dependencies_restricted/ ; rm ../dependencies_npm-merged.csv 2>/dev/null ; cat *.csv | grep -v "Project ID,Pro" >> ../dependencies_npm-merged.csv ; cd ~/git/Bugs/dependency/
+# cd $BASEDIR/libraries-1.4.0-2018-12-22/dependencies_restricted/ ; \
+#     rm ../dependencies_npm-merged.csv 2>/dev/null ; \
+#     cat *.csv | grep -v "Project ID,Pro" >> ../dependencies_npm-merged.csv ; \
+#     cd -
 
-
-./30_create_dependency_graph.py \
-  $BASEDIR/libraries-1.4.0-2018-12-22/ \
-  dependencies_npm-merged.csv \
-  dependencies_npm-merged.gexf \
-  versions_npm-restricted.csv
+# ./30_create_dependency_graph.py \
+#   $BASEDIR/libraries-1.4.0-2018-12-22/ \
+#   dependencies_npm-merged.csv \
+#   dependencies_npm-merged.gexf \
+#   versions_npm-restricted.csv

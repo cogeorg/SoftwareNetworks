@@ -24,11 +24,12 @@ def read_version_file(file_name):
     with open(file_name) as version_file:
         for line in version_file:
             tokens = line.strip().split(";")
-            if "Project ID" not in line:  # drop header
-                try:
-                    versions[int(float(tokens[0]))].append(tokens[1])
-                except:
-                    versions[int(float(tokens[0]))] = [tokens[1]]
+            if len(tokens) == 3:  # avoid empty lines
+                if "Project ID" not in line:  # drop header
+                    try:
+                        versions[int(float(tokens[0]))].append(tokens[1])
+                    except:
+                        versions[int(float(tokens[0]))] = [tokens[1]]
 
     if False:
         for key in versions:
