@@ -43,14 +43,15 @@ def do_run(base_directory, input_directory, output_directory, identifier):
         try:
             dependencies = pd.read_csv(
                                 merge_file_name,
+                                skiprows=1,  # ignore header
                                 delimiter=";",
                                 names=["Project ID","Project Name","Version Number","Dependency Requirements","Dependency Project ID"],
                                 dtype = {
-                                "Project ID": int,
-                                "Project Name": str,
-                                "Version Number": str,
-                                "Dependency Requirements": str,
-                                "Dependency Project ID": str
+                                    "Project ID": int,
+                                    "Project Name": str,
+                                    "Version Number": str,
+                                    "Dependency Requirements": str,
+                                    "Dependency Project ID": str
                                 }
                             )
             if False:
