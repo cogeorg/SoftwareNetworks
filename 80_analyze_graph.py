@@ -17,7 +17,7 @@ import networkx as nx
 # -------------------------------------------------------------------------
 # do_run(file_name)
 # -------------------------------------------------------------------------
-def do_run(base_directory, identifier, output_filename):
+def do_run(base_directory, identifier, output_filename, task):
     input_filename = base_directory + identifier + "-merged.gexf"
     print("<<<<<< WORKING ON: " + input_filename)
     
@@ -25,7 +25,7 @@ def do_run(base_directory, identifier, output_filename):
     G = nx.read_gexf(input_filename)
     print(str(datetime.datetime.now()) + "  >> COMPLETE READING .gexf FILE")
 
-    if True:
+    if task == "sample_graph":
         sample_graph_filename = base_directory + identifier + "-sampled.gexf"
         H = nx.DiGraph()
         for u,v in G.edges():
@@ -52,9 +52,10 @@ if __name__ == '__main__':
     base_directory = args[1]
     identifier = args[2]
     output_filename = args[3]
+    task = args[4]
 
 
 #
 # CODE
 #
-    do_run(base_directory, identifier, output_filename)
+    do_run(base_directory, identifier, output_filename, task)

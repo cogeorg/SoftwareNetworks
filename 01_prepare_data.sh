@@ -98,5 +98,6 @@ DEPFILE=dependencies_$BASENAME.csv
 ./80_analyze_graph.py \
   $BASEDIR \
   dependencies_$BASENAME \
-  analysis_$BASENAME.csv
+  analysis_$BASENAME.csv \
+  sample_graph
   
