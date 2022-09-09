@@ -7,6 +7,7 @@ import sys
 import os
 import re
 import datetime
+import random
 
 import networkx as nx
 
@@ -218,13 +219,16 @@ def find_matches(versions, from_id, from_version, dep_req, dep_id):
 # -------------------------------------------------------------------------
 # do_run(file_name)
 # -------------------------------------------------------------------------
-def do_run(base_directory, input_file_name, output_file_name, version_file_name):
+def do_run(base_directory, input_file_name, output_identifier, version_file_name, options):
     line_count = 0
     error_count = 0
 
-    G = nx.DiGraph()
+    sample_size = 0.1
 
-    print("<<<<<< WORKING ON: " + base_directory + input_file_name + " USING VERSION FILE: " + base_directory + version_file_name)
+    G = nx.DiGraph()
+    H = nx.DiGraph()
+
+    print(str(datetime.datetime.now()) + " <<<<<< START WORKING ON: " + base_directory + input_file_name + " USING VERSION FILE: " + base_directory + version_file_name)
 
     versions = read_version_file(base_directory + version_file_name)
     
@@ -251,6 +255,9 @@ def do_run(base_directory, input_file_name, output_file_name, version_file_name)
                             for match in matches:
                                 to_node = str(to_id) + "-" + match
                                 G.add_edge(from_node, to_node)
+                                if options == "1":
+                                    if random.random() < sample_size:
+                                        H.add_edge(from_node, to_node)
                     else:
                         error_count += 1
                         # print("  << TOKEN ERROR:", len(tokens), tokens)
@@ -260,11 +267,22 @@ def do_run(base_directory, input_file_name, output_file_name, version_file_name)
                 print("    << WARNING TOKEN LENGTH:", len(tokens), tokens)
 
     if True:  # debugging
-        print("    >>> G: # Nodes: " + str(len(G.nodes())) + " # Edges: " + str(len(G.edges())) + " WITH: " + str(error_count) + " ERRORS.")
+        print("    << " + str(datetime.datetime.now()) + " G: # Nodes: " + str(len(G.nodes())) + " # Edges: " + str(len(G.edges())) + " WITH: " + str(error_count) + " ERRORS.")
+        if options == "1":
+            print("    << " + str(datetime.datetime.now()) + " H: # Nodes: " + str(len(H.nodes())) + " # Edges: " + str(len(H.edges())))
 
-    nx.write_gexf(G, base_directory + output_file_name)
-    print("    >>> FILE WRITTEN TO:" + base_directory + output_file_name)
-    print(">>>>>> FINISHED WORKING ON " + str(line_count) + " LINES")
+    if options == "1":
+        nx.write_edgelist(H, base_directory + "sampled-" + str(sample_size) + "_" + output_identifier + ".dat", data=False)
+
+        # nx.write_gexf(H, base_directory + "sampled-" + str(sample_size) + "_" + output_identifier + ".gexf")
+        print("    << " + str(datetime.datetime.now()) + " SAMPLE FILE WRITTEN TO:" + base_directory + "sampled-" + str(sample_size) + "_" + output_identifier)
+    
+    if True:
+        nx.write_edgelist(G, base_directory + output_identifier + ".dat", data=False)
+        # nx.write_gexf(G, base_directory + output_identifier + ".gexf")
+    print("    << " + str(datetime.datetime.now()) + " FILE WRITTEN TO:" + base_directory + output_identifier)
+
+    print(str(datetime.datetime.now()) + " >>>>>> FINISHED WORKING ON " + str(line_count) + " LINES")
 # -------------------------------------------------------------------------
 
 
@@ -280,10 +298,11 @@ if __name__ == '__main__':
     args = sys.argv
     base_directory = args[1]
     input_file_name = args[2]
-    output_file_name = args[3]
+    output_identifier = args[3]
     version_file_name = args[4]
+    options = args[5]
 
 #
 # CODE
 #
-    do_run(base_directory, input_file_name, output_file_name, version_file_name)
+    do_run(base_directory, input_file_name, output_identifier, version_file_name, options)

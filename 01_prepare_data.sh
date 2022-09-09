@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 BASEDIR=/c/Users/user-pc/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/libraries-1.4.0-2018-12-22/
-# BASENAME=npm
-BASENAME=test1
+BASENAME=npm
+# BASENAME=test1
 DEPFILE=dependencies_$BASENAME.csv
 
 # ###########################################################################
@@ -86,18 +86,23 @@ DEPFILE=dependencies_$BASENAME.csv
 #     cat *.csv | grep -v "Project ID,Pro" >> ../dependencies_npm-merged.csv ; \
 #     cd -
 
-# ./30_create_dependency_graph.py \
+./30_create_dependency_graph.py \
+  $BASEDIR \
+  dependencies_npm-merged.csv \
+  dependencies_npm-merged \
+  versions_npm-restricted.csv \
+  1
+
+# ./31_prepare_oslom.py \
 #   $BASEDIR \
-#   dependencies_npm-merged.csv \
-#   dependencies_npm-merged.gexf \
-#   versions_npm-restricted.csv
+#   sampled-0.01_dependencies_$BASENAME
+
 
 #
 # STEP 3 - ANALYZE DEPENDENCY GRAPH
 # 
-./80_analyze_graph.py \
-  $BASEDIR \
-  dependencies_$BASENAME \
-  analysis_$BASENAME.csv \
-  sample_graph
+# ./80_analyze_graph.py \
+#   $BASEDIR \
+#   sampled-0.01_dependencies_$BASENAME \
+#   analyze_graph
   
