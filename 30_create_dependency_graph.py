@@ -226,7 +226,7 @@ def do_run(base_directory, input_file_name, output_identifier, version_file_name
     G = nx.DiGraph()
     H = nx.DiGraph()
 
-    print(str(datetime.datetime.now()) + " <<<<<< START WORKING ON: " + base_directory + input_file_name + " USING VERSION FILE: " + base_directory + version_file_name)
+    print(str(datetime.datetime.now()) + " <<<<<< START WORKING ON: " + base_directory + input_file_name + " USING VERSION FILE: " + base_directory + version_file_name + " AND SAMPLE SIZE: " + str(sample_size))
 
     versions = read_version_file(base_directory + version_file_name)
     

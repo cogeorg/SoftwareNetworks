@@ -52,9 +52,9 @@ DEPFILE=dependencies_$BASENAME.csv
 # cd $GITDIR
 
 # the last argument indicates whether or not a sample is created.
-./30_create_dependency_graph.py \
-  $BASEDIR \
-  dependencies_npm-merged.csv \
-  dependencies_npm-merged \
-  versions_npm-restricted.csv \
-  0.01
+#./30_create_dependency_graph.py $BASEDIR dependencies_npm-merged.csv dependencies_npm-merged versions_npm-restricted.csv 0.01
+./30_create_dependency_graph.py $BASEDIR dependencies_npm-merged.csv dependencies_npm-merged versions_npm-restricted.csv 0.01 
+./30_create_dependency_graph.py $BASEDIR dependencies_npm-merged.csv dependencies_npm-merged versions_npm-restricted.csv 0.05 
+./30_create_dependency_graph.py $BASEDIR dependencies_npm-merged.csv dependencies_npm-merged versions_npm-restricted.csv 0.10 
+./30_create_dependency_graph.py $BASEDIR dependencies_npm-merged.csv dependencies_npm-merged versions_npm-restricted.csv 0.25 
+./30_create_dependency_graph.py $BASEDIR dependencies_npm-merged.csv dependencies_npm-merged versions_npm-restricted.csv 0.50 
