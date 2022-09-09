@@ -219,11 +219,9 @@ def find_matches(versions, from_id, from_version, dep_req, dep_id):
 # -------------------------------------------------------------------------
 # do_run(file_name)
 # -------------------------------------------------------------------------
-def do_run(base_directory, input_file_name, output_identifier, version_file_name, options):
+def do_run(base_directory, input_file_name, output_identifier, version_file_name, sample_size):
     line_count = 0
     error_count = 0
-
-    sample_size = 0.1
 
     G = nx.DiGraph()
     H = nx.DiGraph()
@@ -255,7 +253,7 @@ def do_run(base_directory, input_file_name, output_identifier, version_file_name
                             for match in matches:
                                 to_node = str(to_id) + "-" + match
                                 G.add_edge(from_node, to_node)
-                                if options == "1":
+                                if sample_size != 0.0:
                                     if random.random() < sample_size:
                                         H.add_edge(from_node, to_node)
                     else:
@@ -268,10 +266,10 @@ def do_run(base_directory, input_file_name, output_identifier, version_file_name
 
     if True:  # debugging
         print("    << " + str(datetime.datetime.now()) + " G: # Nodes: " + str(len(G.nodes())) + " # Edges: " + str(len(G.edges())) + " WITH: " + str(error_count) + " ERRORS.")
-        if options == "1":
+        if sample_size != 0.0:
             print("    << " + str(datetime.datetime.now()) + " H: # Nodes: " + str(len(H.nodes())) + " # Edges: " + str(len(H.edges())))
 
-    if options == "1":
+    if sample_size != 0.0:
         nx.write_edgelist(H, base_directory + "sampled-" + str(sample_size) + "_" + output_identifier + ".dat", data=False)
 
         # nx.write_gexf(H, base_directory + "sampled-" + str(sample_size) + "_" + output_identifier + ".gexf")
@@ -300,9 +298,9 @@ if __name__ == '__main__':
     input_file_name = args[2]
     output_identifier = args[3]
     version_file_name = args[4]
-    options = args[5]
+    sample_size = float(args[5])
 
 #
 # CODE
 #
-    do_run(base_directory, input_file_name, output_identifier, version_file_name, options)
+    do_run(base_directory, input_file_name, output_identifier, version_file_name, sample_size)
