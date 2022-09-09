@@ -86,12 +86,12 @@ DEPFILE=dependencies_$BASENAME.csv
 #     cat *.csv | grep -v "Project ID,Pro" >> ../dependencies_npm-merged.csv ; \
 #     cd -
 
-./30_create_dependency_graph.py \
-  $BASEDIR \
-  dependencies_npm-merged.csv \
-  dependencies_npm-merged \
-  versions_npm-restricted.csv \
-  1
+# ./30_create_dependency_graph.py \
+#   $BASEDIR \
+#   dependencies_npm-merged.csv \
+#   dependencies_npm-merged \
+#   versions_npm-restricted.csv \
+#   1
 
 # ./31_prepare_oslom.py \
 #   $BASEDIR \
