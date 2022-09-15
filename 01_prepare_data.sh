@@ -51,10 +51,48 @@ DEPFILE=dependencies_$BASENAME.csv
 #     cat *.csv | grep -v "Project ID,Pro" >> ../dependencies_npm-merged.csv
 # cd $GITDIR
 
+#
+# IDENTIFY COMMUNITIES USING OSLOM
+#
 # the last argument indicates whether or not a sample is created.
 # ./30_create_dependency_graph.py $BASEDIR dependencies_npm-merged.csv dependencies_npm-merged versions_npm-restricted.csv 0.01 
+# ./31_prepare_oslom.py \
+#   $BASEDIR \
+#   sampled-0.01_dependencies_npm
+
 # ./30_create_dependency_graph.py $BASEDIR dependencies_npm-merged.csv dependencies_npm-merged versions_npm-restricted.csv 0.05 
+# ./31_prepare_oslom.py \
+#   $BASEDIR \
+#   sampled-0.05_dependencies_npm
+
 # ./30_create_dependency_graph.py $BASEDIR dependencies_npm-merged.csv dependencies_npm-merged versions_npm-restricted.csv 0.10 
+# ./31_prepare_oslom.py \
+#   $BASEDIR \
+#   sampled-0.1_dependencies_npm
+
 # ./30_create_dependency_graph.py $BASEDIR dependencies_npm-merged.csv dependencies_npm-merged versions_npm-restricted.csv 0.25 
+./31_prepare_oslom.py \
+  $BASEDIR \
+  sampled-0.25_dependencies_npm
+
 # ./30_create_dependency_graph.py $BASEDIR dependencies_npm-merged.csv dependencies_npm-merged versions_npm-restricted.csv 0.50 
-./30_create_dependency_graph.py $BASEDIR dependencies_npm-merged.csv dependencies_npm-merged versions_npm-restricted.csv 0.0
+./31_prepare_oslom.py \
+  $BASEDIR \
+  sampled-0.5_dependencies_npm
+
+# ./30_create_dependency_graph.py $BASEDIR dependencies_npm-merged.csv dependencies_npm-merged versions_npm-restricted.csv 0.0
+# ./31_prepare_oslom.py \
+#   $BASEDIR \
+#   dependencies_npm
+
+# THEN RUN OSLOM
+# date ; ./oslom_undir.exe -r 1 -hr 1 -uw -f ~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/npm/enc_sampled-0.01_dependencies_npm-merged.dat ; date
+
+#
+# ANALYZE GRAPH USING NETWORKX 
+#
+# ./80_analyze_graph.py \
+#   $BASEDIR \
+#   dependencies_$BASENAME \
+#   analysis_$BASENAME.csv \
+#   sample_graph
