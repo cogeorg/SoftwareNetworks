@@ -59,26 +59,31 @@ DEPFILE=dependencies_$BASENAME.csv
 # ./31_prepare_oslom.py \
 #   $BASEDIR \
 #   sampled-0.01_dependencies_npm
+# ./32_create_largest_component.py $BASEDIR enc_sampled-0.01_dependencies_npm-merged
 
 # ./30_create_dependency_graph.py $BASEDIR dependencies_npm-merged.csv dependencies_npm-merged versions_npm-restricted.csv 0.05 
 # ./31_prepare_oslom.py \
 #   $BASEDIR \
 #   sampled-0.05_dependencies_npm
+# ./32_create_largest_component.py $BASEDIR enc_sampled-0.05_dependencies_npm-merged
 
 # ./30_create_dependency_graph.py $BASEDIR dependencies_npm-merged.csv dependencies_npm-merged versions_npm-restricted.csv 0.10 
 # ./31_prepare_oslom.py \
 #   $BASEDIR \
 #   sampled-0.1_dependencies_npm
+# ./32_create_largest_component.py $BASEDIR enc_sampled-0.1_dependencies_npm-merged
 
 # ./30_create_dependency_graph.py $BASEDIR dependencies_npm-merged.csv dependencies_npm-merged versions_npm-restricted.csv 0.25 
-./31_prepare_oslom.py \
-  $BASEDIR \
-  sampled-0.25_dependencies_npm
+# ./31_prepare_oslom.py \
+#   $BASEDIR \
+#   sampled-0.25_dependencies_npm
+# ./32_create_largest_component.py $BASEDIR enc_sampled-0.25_dependencies_npm-merged
 
 # ./30_create_dependency_graph.py $BASEDIR dependencies_npm-merged.csv dependencies_npm-merged versions_npm-restricted.csv 0.50 
-./31_prepare_oslom.py \
-  $BASEDIR \
-  sampled-0.5_dependencies_npm
+# ./31_prepare_oslom.py \
+#   $BASEDIR \
+#   sampled-0.5_dependencies_npm
+# ./32_create_largest_component.py $BASEDIR enc_sampled-0.5_dependencies_npm-merged
 
 # ./30_create_dependency_graph.py $BASEDIR dependencies_npm-merged.csv dependencies_npm-merged versions_npm-restricted.csv 0.0
 # ./31_prepare_oslom.py \
@@ -91,8 +96,7 @@ DEPFILE=dependencies_$BASENAME.csv
 #
 # ANALYZE GRAPH USING NETWORKX 
 #
-# ./80_analyze_graph.py \
-#   $BASEDIR \
-#   dependencies_$BASENAME \
-#   analysis_$BASENAME.csv \
-#   sample_graph
+# ./32_create_largest_component.py $BASEDIR enc_sampled-0.01_dependencies_npm-merged
+./80_analyze_graph.py \
+  $BASEDIR \
+  enc_sampled-0.01_dependencies_npm-merged
