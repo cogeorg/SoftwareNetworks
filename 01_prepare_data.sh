@@ -96,7 +96,7 @@ DEPFILE=dependencies_$BASENAME.csv
 #
 # ANALYZE GRAPH USING NETWORKX 
 #
-# ./32_create_largest_component.py $BASEDIR enc_sampled-0.01_dependencies_npm-merged
+./32_create_largest_component.py $BASEDIR enc_sampled-0.01_dependencies_npm-merged
 ./80_analyze_graph.py \
   $BASEDIR \
   enc_sampled-0.01_dependencies_npm-merged
