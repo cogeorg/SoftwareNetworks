@@ -9,6 +9,8 @@ import random
 
 import networkx as nx
 
+compute_clustering = False
+compute_centralities = False
 
 # ###########################################################################
 # METHODS
@@ -64,26 +66,33 @@ def do_run(base_directory, identifier):
     print(str(datetime.datetime.now()) + "    << FINISHED COMPUTING DEGREE DISTRIBUTIONS")
     
     # CLUSTERING, PATH LENGTH
-    avg_shortest_path_length = nx.average_shortest_path_length(largest_cc)
-    avg_clustering = nx.average_clustering(largest_cc)
-    print(str(datetime.datetime.now()) + "    << FINISHED COMPUTING CLUSTERING + PATH LENGTH")
+    if compute_clustering:
+        avg_shortest_path_length = nx.average_shortest_path_length(largest_cc)
+        avg_clustering = nx.average_clustering(largest_cc)
+        print(str(datetime.datetime.now()) + "    << FINISHED COMPUTING CLUSTERING + PATH LENGTH")
 
     # CENTRALITIES FOR EACH NODE
-    degree_centrality = nx.degree_centrality(G)
-    eigenvector_centrality = nx.eigenvector_centrality(G)
-    closeness_centrality = nx.closeness_centrality(G)
-    betweenness_centrality = nx.betweenness_centrality(G)
-    print(str(datetime.datetime.now()) + "    << FINISHED COMPUTING CENTRALITIES")
+    if compute_centralities:
+        degree_centrality = nx.degree_centrality(G)
+        eigenvector_centrality = nx.eigenvector_centrality(G)
+        closeness_centrality = nx.closeness_centrality(G)
+        betweenness_centrality = nx.betweenness_centrality(G)
+        print(str(datetime.datetime.now()) + "    << FINISHED COMPUTING CENTRALITIES")
 
     
     # DONE
     print(str(datetime.datetime.now()) + "  << COMPLETED NETWORK ANALYSIS")
 
-    out_text = "num_nodes;num_edges;num_conn_comp;size_largest_cc;avg_shortest_path_length-lcc;average_clustering-lcc\n"
+    out_text = "num_nodes;num_edges;num_conn_comp;size_largest_cc"
+    if compute_clustering:
+        out_text += ";avg_shortest_path_length-lcc;average_clustering-lcc\n"
+    out_text += "\n"
+
     out_text += str(num_nodes) + ";" + str(num_edges) + ";" \
-        + str(num_connected_components) + ";" + str(size_largest_cc) \
-        + str(avg_shortest_path_length) + ";" + str(avg_clustering) \
-        + "\n"
+        + str(num_connected_components) + ";" + str(size_largest_cc)
+    if compute_clustering:
+        out_text += ";" + str(avg_shortest_path_length) + ";" + str(avg_clustering)
+    out_text += "\n"
 
     out_file = open(output_filename, "w")
     out_file.write(out_text)

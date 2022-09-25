@@ -55,6 +55,12 @@ DEPFILE=dependencies_$BASENAME.csv
 # IDENTIFY COMMUNITIES USING OSLOM
 #
 # the last argument indicates whether or not a sample is created.
+# ./30_create_dependency_graph.py $BASEDIR dependencies_npm-merged.csv dependencies_npm-merged versions_npm-restricted.csv 0.001 
+# ./31_prepare_oslom.py \
+#   $BASEDIR \
+#   sampled-0.001_dependencies_npm
+# ./32_create_largest_component.py $BASEDIR enc_sampled-0.001_dependencies_npm-merged
+
 # ./30_create_dependency_graph.py $BASEDIR dependencies_npm-merged.csv dependencies_npm-merged versions_npm-restricted.csv 0.01 
 # ./31_prepare_oslom.py \
 #   $BASEDIR \
@@ -91,12 +97,12 @@ DEPFILE=dependencies_$BASENAME.csv
 #   dependencies_npm
 
 # THEN RUN OSLOM
-# date ; ./oslom_undir.exe -r 1 -hr 1 -uw -f ~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/npm/enc_sampled-0.01_dependencies_npm-merged.dat ; date
+# date ; ./oslom_undir.exe -r 1 -hr 1 -uw -f ~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/npm/enc_sampled-0.001_dependencies_npm-merged.dat ; date
 
 #
 # ANALYZE GRAPH USING NETWORKX 
 #
-./32_create_largest_component.py $BASEDIR enc_sampled-0.01_dependencies_npm-merged
+./32_create_largest_component.py $BASEDIR enc_sampled-0.001_dependencies_npm-merged
 ./80_analyze_graph.py \
   $BASEDIR \
   enc_sampled-0.01_dependencies_npm-merged
