@@ -28,7 +28,7 @@ def do_run(base_directory, identifier):
     print(str(datetime.datetime.now()) + "  << START READING .dat FILE")
     G = nx.read_edgelist(input_filename)  # this is an undirected graph
     print(str(datetime.datetime.now()) + "  >> COMPLETE READING .dat FILE")
-
+    nx.write_gexf(G, base_directory + identifier + ".gexf")
     # nodes, edges
     num_nodes = G.number_of_nodes()
     num_edges = G.number_of_edges()
@@ -39,6 +39,7 @@ def do_run(base_directory, identifier):
     num_connected_components = nx.number_connected_components(G)
     largest_cc = G.subgraph(max(nx.connected_components(G), key=len))
     size_largest_cc = len(largest_cc)
+    nx.write_gexf(largest_cc, base_directory + identifier + "-lcc.gexf")
     print(str(datetime.datetime.now()) + "    << FINISHED COMPUTING COMPONENTS")
 
     # degree (distributions)

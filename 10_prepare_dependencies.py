@@ -15,7 +15,7 @@ import datetime
 # -------------------------------------------------------------------------
 # do_run(file_name)
 # -------------------------------------------------------------------------
-def do_run(base_directory, input_file_name, output_file_name):
+def do_run(base_directory, input_file_name, output_file_name, repo):
 
     out_text = "Project ID;Project Name;Version Number;Dependency Requirements;Dependency Project ID\n"
     out_file = open(base_directory + output_file_name, 'w')
@@ -34,7 +34,7 @@ def do_run(base_directory, input_file_name, output_file_name):
             if _count % 1000000 == 0:
                 print("    << " + str(datetime.datetime.now()) + "  " + str(_count))
             tokens = line.strip().split(",")
-            if tokens[1] == "NPM" or tokens[1] == "npm":
+            if tokens[1] == repo or tokens[1] == repo.upper() or tokens[1] == repo.lower():
                 try:
                     out_file.write(tokens[3] + ";" + tokens[2] + ";" + tokens[4] + ";" + tokens[10] + ";" + tokens[11] + "\n")
                     _found += 1
@@ -65,8 +65,9 @@ if __name__ == '__main__':
     base_directory = args[1]
     input_file_name = args[2]
     output_file_name = args[3]
+    repo = args[4]
 
 #
 # CODE
 #
-    do_run(base_directory, input_file_name, output_file_name)
+    do_run(base_directory, input_file_name, output_file_name, repo)

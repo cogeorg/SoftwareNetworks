@@ -18,7 +18,7 @@ import pandas as pd
 def do_run(base_directory, input_directory, output_directory, identifier):
     print("<<<<<< WORKING ON: " + base_directory + input_directory + " WITH IDENTIFIER: " + identifier + " WRITING TO: " + base_directory + output_directory)
 
-    versions_file_name = base_directory + "versions_" + identifier + "-restricted.csv"
+    versions_file_name = base_directory + identifier + "/versions_" + identifier + ".csv"
     if True:
         print("   << READING VERSIONS: ", versions_file_name)
 

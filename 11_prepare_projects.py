@@ -14,7 +14,7 @@ import datetime
 # -------------------------------------------------------------------------
 # do_run(file_name)
 # -------------------------------------------------------------------------
-def do_run(base_directory, input_file_name, output_file_name):
+def do_run(base_directory, input_file_name, output_file_name, repo):
 
     out_text = "Project ID;Name;Created Timestamp;Updated Timestamp;Versions Count;Dependent Projects Count;Dependent Repositories Count;Repository ID\n"
     out_file = open(base_directory + output_file_name, 'w')
@@ -36,7 +36,7 @@ def do_run(base_directory, input_file_name, output_file_name):
             tokens = line.strip().split(",")
             num_tokens = len(tokens)  # to correct the comma issue
 
-            if tokens[1] == "NPM" or tokens[1] == "npm":
+            if tokens[1] == repo or tokens[1] == repo.upper() or tokens[1] == repo.lower():
                 try:
                     out_text = tokens[0] + ";" + tokens[2] + ";" + tokens[3] + ";" + tokens[4] + ";" + tokens[num_tokens-11] + ";" + tokens[num_tokens-6] + ";" + tokens[num_tokens - 2] + ";" + tokens[num_tokens - 1] + "\n"
                     out_file.write(out_text)
@@ -68,8 +68,9 @@ if __name__ == '__main__':
     base_directory = args[1]
     input_file_name = args[2]
     output_file_name = args[3]
+    repo = args[4]
 
 #
 # CODE
 #
-    do_run(base_directory, input_file_name, output_file_name)
+    do_run(base_directory, input_file_name, output_file_name, repo)

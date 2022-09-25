@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 GITDIR=/c/Users/user-pc/git/SoftwareNetworks/
-BASENAME=npm
-BASEDIR=/c/Users/user-pc/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/$BASENAME/
+BASENAME=Cargo
+BASEDIR=/c/Users/user-pc/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/
 DEPFILE=dependencies_$BASENAME.csv
 
 # ###########################################################################
@@ -18,38 +18,43 @@ DEPFILE=dependencies_$BASENAME.csv
 # THEN:
 # ./10_prepare_dependencies.py \
 #   $BASEDIR \
-#   dependencies-1.4.0-2018-12-22.csv \
-#   $DEPFILE
+#   libraries-1.4.0-2018-12-22/dependencies-1.4.0-2018-12-22.csv \
+#   $BASENAME/$DEPFILE \
+#   $BASENAME
 
 # ./11_prepare_projects.py \
 #   $BASEDIR/ \
-#   projects-1.4.0-2018-12-22.csv \
-#   projects_npm.csv
+#   libraries-1.4.0-2018-12-22/projects-1.4.0-2018-12-22.csv \
+#   $BASENAME/projects_$BASENAME.csv \
+#   $BASENAME
 
 # ./12_prepare_versions.py \
 #   $BASEDIR \
-#   versions-1.4.0-2018-12-22.csv \
-#   versions_npm-restricted.csv \
+#   libraries-1.4.0-2018-12-22/versions-1.4.0-2018-12-22.csv \
+#   $BASENAME/versions_$BASENAME.csv \
 #   2011-01-01 \
-#   2021-12-31
+#   2021-12-31 \
+#   $BASENAME 
 
 #
 # STEP 2 - CREATE DEPENDENCY GRAPH
 #
 # execute in data directory...
-# cd $BASEDIR/ ; split -l 100000 -d -a 5 $DEPFILE  ; mv x* dependencies/ ; cd dependencies ; for i in `ls` ; do mv $i $i.csv ; done ; cd $GITDIR
+# cd $BASEDIR/$BASENAME ; split -l 100000 -d -a 5 $DEPFILE  ; mv x* dependencies/ ; cd dependencies ; for i in `ls` ; do mv $i $i.csv ; done ; cd $GITDIR
 
 # ...then execute in this directory:
 # ./20_merge_data.py \
 #   $BASEDIR/ \
-#   dependencies/ \
-#   dependencies_restricted/ \
+#   $BASENAME/dependencies/ \
+#   $BASENAME/ \
 #   $BASENAME
 
-# cd $BASEDIR/dependencies_restricted/ ; \
-#     rm ../dependencies_npm-merged.csv 2>/dev/null ; \
-#     cat *.csv | grep -v "Project ID,Pro" >> ../dependencies_npm-merged.csv
+# cd $BASEDIR/$BASENAME ; \
+#     rm dependencies_$BASENAME-merged.csv 2>/dev/null ; \
+#     cat x*.csv | grep -v "Project ID,Pro" >> dependencies_$BASENAME-merged.csv ; \
+#     rm x*.csv
 # cd $GITDIR
+
 
 #
 # IDENTIFY COMMUNITIES USING OSLOM
@@ -91,18 +96,18 @@ DEPFILE=dependencies_$BASENAME.csv
 #   sampled-0.5_dependencies_npm
 # ./32_create_largest_component.py $BASEDIR enc_sampled-0.5_dependencies_npm-merged
 
-# ./30_create_dependency_graph.py $BASEDIR dependencies_npm-merged.csv dependencies_npm-merged versions_npm-restricted.csv 0.0
+# ./30_create_dependency_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-merged.csv dependencies_$BASENAME-merged versions_$BASENAME.csv 0.0
 # ./31_prepare_oslom.py \
-#   $BASEDIR \
-#   dependencies_npm
+#   $BASEDIR/$BASENAME/ \
+#   dependencies_$BASENAME
 
 # THEN RUN OSLOM
-# date ; ./oslom_undir.exe -r 1 -hr 1 -uw -f ~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/npm/enc_sampled-0.001_dependencies_npm-merged.dat ; date
+# date ; cd OSLOM2/ ; ./oslom_undir.exe -r 1 -hr 1 -uw -f ~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/$BASENAME/enc_dependencies_$BASENAME-merged.dat ; date
 
 #
 # ANALYZE GRAPH USING NETWORKX 
 #
-./32_create_largest_component.py $BASEDIR enc_sampled-0.001_dependencies_npm-merged
+# ./32_create_largest_component.py $BASEDIR/$BASENAME/ enc_dependencies_$BASENAME-merged
 ./80_analyze_graph.py \
-  $BASEDIR \
-  enc_sampled-0.01_dependencies_npm-merged
+  $BASEDIR/$BASENAME/ \
+  enc_dependencies_$BASENAME-merged
