@@ -35,8 +35,13 @@ def do_run(base_directory, identifier):
         except:
             pass
 
-    # for key in node_dict.keys():
-    #     print(key, node_dict[key])
+    key_filename = base_directory + "key_" + identifier + "-merged.dat"
+    key_text = "key;node_id\n"
+    for key in node_dict.keys():
+        key_text += key + ";" + str(node_dict[key]) + "\n"
+    key_file = open(key_filename, "w")
+    key_file.write(key_text)
+    key_file.close()
 
     out_text = ""
     for u,v in G.edges():

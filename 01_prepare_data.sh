@@ -97,9 +97,9 @@ DEPFILE=dependencies_$BASENAME.csv
 # ./32_create_largest_component.py $BASEDIR enc_sampled-0.5_dependencies_npm-merged
 
 # ./30_create_dependency_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-merged.csv dependencies_$BASENAME-merged versions_$BASENAME.csv 0.0
-# ./31_prepare_oslom.py \
-#   $BASEDIR/$BASENAME/ \
-#   dependencies_$BASENAME
+./31_prepare_oslom.py \
+  $BASEDIR/$BASENAME/ \
+  dependencies_$BASENAME
 
 # THEN RUN OSLOM
 # date ; cd OSLOM2/ ; ./oslom_undir.exe -r 1 -hr 1 -uw -f ~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/$BASENAME/enc_dependencies_$BASENAME-merged.dat ; date
@@ -108,6 +108,6 @@ DEPFILE=dependencies_$BASENAME.csv
 # ANALYZE GRAPH USING NETWORKX 
 #
 # ./32_create_largest_component.py $BASEDIR/$BASENAME/ enc_dependencies_$BASENAME-merged
-./80_analyze_graph.py \
-  $BASEDIR/$BASENAME/ \
-  enc_dependencies_$BASENAME-merged
+# ./80_analyze_graph.py \
+#   $BASEDIR/$BASENAME/ \
+#   enc_dependencies_$BASENAME-merged
