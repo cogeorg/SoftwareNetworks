@@ -116,4 +116,5 @@ DEPFILE=dependencies_$BASENAME.csv
 #
 # PREPARE COVARIATES
 #
-# python 51_prepare_covariates-contributors.py ~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/Cargo/covariates/ Contributor_commits.csv Contributor_commits-clean.csv
+python 50_prepare_covariates.py ~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/Cargo/covariates/ Cargo_project_metadata.csv covariates_maintainers-1.csv
+python 51_prepare_covariates-contributors.py ~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/Cargo/covariates/ Contributor_commits.csv covariates-contributors-1.csv
