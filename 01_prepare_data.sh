@@ -108,6 +108,13 @@ DEPFILE=dependencies_$BASENAME.csv
 # ANALYZE GRAPH USING NETWORKX 
 #
 # ./32_create_largest_component.py $BASEDIR/$BASENAME/ enc_dependencies_$BASENAME-merged
-./80_analyze_graph.py \
-  $BASEDIR/$BASENAME/ \
-  enc_dependencies_$BASENAME-merged
+# ./80_analyze_graph.py \
+#   $BASEDIR/$BASENAME/ \
+#   enc_dependencies_$BASENAME-merged
+
+
+#
+# PREPARE COVARIATES
+#
+python 50_prepare_covariates.py ~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/Cargo/covariates/ Cargo_project_metadata.csv covariates_maintainers-1.csv
+python 51_prepare_covariates-contributors.py ~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/Cargo/covariates/ Contributor_commits.csv covariates-contributors-1.csv
