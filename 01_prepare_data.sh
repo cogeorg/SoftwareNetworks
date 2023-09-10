@@ -1,7 +1,8 @@
-#!/usr/bin/bash
-GITDIR=/c/Users/user-pc/git/SoftwareNetworks/
+#!/usr/bin/env bash
+GITDIR=~/git/SoftwareNetworks/
+BASEDIR=~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/
+
 BASENAME=Cargo
-BASEDIR=/c/Users/user-pc/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/
 DEPFILE=dependencies_$BASENAME.csv
 
 # ###########################################################################
@@ -119,26 +120,26 @@ DEPFILE=dependencies_$BASENAME.csv
 #   $BASEDIR/$BASENAME/ \
 #   sampled-0.01_dependencies_$BASENAME-merged
 
-./30_create_dependency_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-merged.csv dependencies_$BASENAME-merged versions_$BASENAME.csv 0.1
-./32_create_largest_component.py $BASEDIR/$BASENAME/ sampled-0.1_dependencies_$BASENAME-merged
-./80_analyze_graph.py \
-  $BASEDIR/$BASENAME/ \
-  sampled-0.1_dependencies_$BASENAME-merged
+# ./30_create_dependency_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-merged.csv dependencies_$BASENAME-merged versions_$BASENAME.csv 0.1
+# ./32_create_largest_component.py $BASEDIR/$BASENAME/ sampled-0.1_dependencies_$BASENAME-merged
+# ./80_analyze_graph.py \
+#   $BASEDIR/$BASENAME/ \
+#   sampled-0.1_dependencies_$BASENAME-merged
 
-./30_create_dependency_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-merged.csv dependencies_$BASENAME-merged versions_$BASENAME.csv 0.4
-./32_create_largest_component.py $BASEDIR/$BASENAME/ sampled-0.4_dependencies_$BASENAME-merged
-./80_analyze_graph.py \
-  $BASEDIR/$BASENAME/ \
-  sampled-0.4_dependencies_$BASENAME-merged
+# ./30_create_dependency_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-merged.csv dependencies_$BASENAME-merged versions_$BASENAME.csv 0.4
+# ./32_create_largest_component.py $BASEDIR/$BASENAME/ sampled-0.4_dependencies_$BASENAME-merged
+# ./80_analyze_graph.py \
+#   $BASEDIR/$BASENAME/ \
+#   sampled-0.4_dependencies_$BASENAME-merged
 
-./30_create_dependency_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-merged.csv dependencies_$BASENAME-merged versions_$BASENAME.csv
-./32_create_largest_component.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-merged
-./80_analyze_graph.py \
-  $BASEDIR/$BASENAME/ \
-  dependencies_$BASENAME-merged
+# ./30_create_dependency_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-merged.csv dependencies_$BASENAME-merged versions_$BASENAME.csv
+# ./32_create_largest_component.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-merged
+# ./80_analyze_graph.py \
+#   $BASEDIR/$BASENAME/ \
+#   dependencies_$BASENAME-merged
 
 #
 # PREPARE COVARIATES
 #
-# python 50_prepare_covariates.py ~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/Cargo/covariates/ Cargo_project_metadata.csv covariates_maintainers-1.csv
+python3 50_prepare_covariates.py ~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/Cargo/covariates/ Cargo_project_metadata.csv covariates_maintainers-1.csv
 # python 51_prepare_covariates-contributors.py ~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/Cargo/covariates/ Contributor_commits.csv covariates-contributors-1.csv
