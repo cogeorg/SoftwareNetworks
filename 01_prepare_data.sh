@@ -1,15 +1,140 @@
 #!/usr/bin/env bash
-GITDIR=~/git/SoftwareNetworks/
-BASEDIR=~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/
+# BASEDIR=~/Dropbox/Papers/10_WorkInProgress/SoftwareProductionNetworks/Data/
+BASEDIR=~/Downloads/
+GITDIR=~/Git/SoftwareProductionNetworks/
 
+# ###########################################################################
+#
+# PRODUCTION RUN 1.6.0 -- Cargo
+#
+# ###########################################################################
+VERSION=1.6.0-2020-01-12
 BASENAME=Cargo
+LANGUAGE=Rust
 DEPFILE=dependencies_$BASENAME.csv
 
+#
+# STEP 1 -- PREPARE ORIGINAL DATA
+#
+# USES libraries-1.6.0-2020-01-12.tar.gz
+#
+
+# ./10_prepare_repositories-1.6.0.py \
+#   $BASEDIR \
+#   libraries-$VERSION/repositories-$VERSION.csv \
+#   $BASENAME/repositories_$BASENAME.csv \
+#   $LANGUAGE
+
+# ./10_prepare_projects-1.6.0.py \
+#   $BASEDIR \
+#   libraries-$VERSION/projects-$VERSION.csv \
+#   $BASENAME/projects_$BASENAME.csv \
+#   $BASENAME
+
+# ON PROJECT LEVEL
+# ./11_prepare_dependencies-1.6.0.py \
+#   $BASEDIR \
+#   libraries-$VERSION/dependencies-$VERSION.csv \
+#   $BASENAME/dependencies_$BASENAME.csv \
+#   $BASENAME
+# ON REPO LEVEL
+# ./10_prepare_dependencies-1.6.0.py \
+#   /Volumes/Transcend/Data/ \
+#   libraries-$VERSION/repository_dependencies-$VERSION.csv \
+#   $BASENAME/repo_dependencies_$BASENAME.csv \
+#   $BASENAME
+# TEST
+# ./10_prepare_dependencies-1.6.0.py \
+#   ~/Downloads/ \
+#   libraries-$VERSION/repository_dependencies-test.csv \
+#   $BASENAME/dependencies_test.csv \
+#   $BASENAME
+
+#
+# CREATE REPO-DEPENDENCY GRAPH
+#
+
+# Note: for large networks, sampling might be helpful. The last number is the sampling probability.
+# TODO: sampling not yet implemented for 1.6.0
+# ./30_create_dependency_graph-1.6.0.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo2.csv dependencies_$BASENAME-repo2 0.0
+
+#
+# ANALYZE DEPENDENCY GRAPH
+# 
+# ./80_analyze_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo2
+# ./81_analyze_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo2-lcc
+
+
 # ###########################################################################
 #
-# PRODUCTION RUN
+# PRODUCTION RUN 1.6.0 -- Pypi
 #
 # ###########################################################################
+VERSION=1.6.0-2020-01-12
+BASENAME=Pypi
+LANGUAGE=Python
+DEPFILE=dependencies_$BASENAME.csv
+
+#
+# STEP 1 -- PREPARE ORIGINAL DATA
+#
+# USES libraries-1.6.0-2020-01-12.tar.gz
+#
+
+# ./10_prepare_repositories-1.6.0.py \
+#   $BASEDIR \
+#   libraries-$VERSION/repositories-$VERSION.csv \
+#   $BASENAME/repositories_$BASENAME.csv \
+#   $LANGUAGE
+
+# ./10_prepare_projects-1.6.0.py \
+#   $BASEDIR \
+#   libraries-$VERSION/projects-$VERSION.csv \
+#   $BASENAME/projects_$BASENAME.csv \
+#   $BASENAME
+
+# ON PROJECT LEVEL
+# ./11_prepare_dependencies-1.6.0.py \
+#   $BASEDIR \
+#   libraries-$VERSION/dependencies-$VERSION.csv \
+#   $BASENAME/dependencies_$BASENAME.csv \
+#   $BASENAME
+# ON REPO LEVEL
+# ./10_prepare_dependencies-1.6.0.py \
+#   /Volumes/Transcend/Data/ \
+#   libraries-$VERSION/repository_dependencies-$VERSION.csv \
+#   $BASENAME/repo_dependencies_$BASENAME.csv \
+#   $BASENAME
+# TEST
+# ./10_prepare_dependencies-1.6.0.py \
+#   ~/Downloads/ \
+#   libraries-$VERSION/repository_dependencies-test.csv \
+#   $BASENAME/dependencies_test.csv \
+#   $BASENAME
+
+#
+# CREATE REPO-DEPENDENCY GRAPH
+#
+
+# Note: for large networks, sampling might be helpful. The last number is the sampling probability.
+# TODO: sampling not yet implemented for 1.6.0
+# ./30_create_dependency_graph-1.6.0.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo.csv dependencies_$BASENAME-repo 0.0 
+# ./30_create_dependency_graph-1.6.0.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo2.csv dependencies_$BASENAME-repo2 0.0
+
+#
+# ANALYZE DEPENDENCY GRAPH
+# 
+# ./80_analyze_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo2
+./81_analyze_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo2-lcc
+
+
+# ###########################################################################
+#
+# PRODUCTION RUN 1.4.0 -- Cargo
+#
+# ###########################################################################
+BASENAME=Cargo
+DEPFILE=dependencies_$BASENAME.csv
 
 #
 # STEP 1 -- PREPARE ORIGINAL DATA
@@ -44,6 +169,7 @@ DEPFILE=dependencies_$BASENAME.csv
 # cd $BASEDIR/$BASENAME ; split -l 100000 -d -a 5 $DEPFILE  ; mv x* dependencies/ ; cd dependencies ; for i in `ls` ; do mv $i $i.csv ; done ; cd $GITDIR
 
 # ...then execute in this directory:
+# NB: In the last x0**** file generated this way was an extra line which had to be manually removed for the next command to work. Will fix at some point.
 # ./20_merge_data.py \
 #   $BASEDIR/ \
 #   $BASENAME/dependencies/ \
@@ -58,88 +184,30 @@ DEPFILE=dependencies_$BASENAME.csv
 
 
 #
-# IDENTIFY COMMUNITIES USING OSLOM
+# CREATE VERSION-DEPENDENCY GRAPH
 #
-# the last argument indicates whether or not a sample is created.
-# ./30_create_dependency_graph.py $BASEDIR dependencies_npm-merged.csv dependencies_npm-merged versions_npm-restricted.csv 0.001 
-# ./31_prepare_oslom.py \
-#   $BASEDIR \
-#   sampled-0.001_dependencies_npm
-# ./32_create_largest_component.py $BASEDIR enc_sampled-0.001_dependencies_npm-merged
 
+# Note: for large networks, sampling might be helpful. The last number is the sampling probability.
 # ./30_create_dependency_graph.py $BASEDIR dependencies_npm-merged.csv dependencies_npm-merged versions_npm-restricted.csv 0.01 
-# ./31_prepare_oslom.py \
-#   $BASEDIR \
-#   sampled-0.01_dependencies_npm
-# ./32_create_largest_component.py $BASEDIR enc_sampled-0.01_dependencies_npm-merged
 
-# ./30_create_dependency_graph.py $BASEDIR dependencies_npm-merged.csv dependencies_npm-merged versions_npm-restricted.csv 0.05 
-# ./31_prepare_oslom.py \
-#   $BASEDIR \
-#   sampled-0.05_dependencies_npm
-# ./32_create_largest_component.py $BASEDIR enc_sampled-0.05_dependencies_npm-merged
-
-# ./30_create_dependency_graph.py $BASEDIR dependencies_npm-merged.csv dependencies_npm-merged versions_npm-restricted.csv 0.10 
-# ./31_prepare_oslom.py \
-#   $BASEDIR \
-#   sampled-0.1_dependencies_npm
-# ./32_create_largest_component.py $BASEDIR enc_sampled-0.1_dependencies_npm-merged
-
-# ./30_create_dependency_graph.py $BASEDIR dependencies_npm-merged.csv dependencies_npm-merged versions_npm-restricted.csv 0.25 
-# ./31_prepare_oslom.py \
-#   $BASEDIR \
-#   sampled-0.25_dependencies_npm
-# ./32_create_largest_component.py $BASEDIR enc_sampled-0.25_dependencies_npm-merged
-
-# ./30_create_dependency_graph.py $BASEDIR dependencies_npm-merged.csv dependencies_npm-merged versions_npm-restricted.csv 0.50 
-# ./31_prepare_oslom.py \
-#   $BASEDIR \
-#   sampled-0.5_dependencies_npm
-# ./32_create_largest_component.py $BASEDIR enc_sampled-0.5_dependencies_npm-merged
-
+# Note: 0.0 means no cuts applied
 # ./30_create_dependency_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-merged.csv dependencies_$BASENAME-merged versions_$BASENAME.csv 0.0
-# ./31_prepare_oslom.py \
-#   $BASEDIR/$BASENAME/ \
-#   dependencies_$BASENAME
-# ./32_create_largest_component.py $BASEDIR enc_sampled-0.0_dependencies_npm-merged
-
-# THEN RUN OSLOM
-# date ; cd OSLOM2/ ; ./oslom_undir.exe -r 1 -hr 1 -uw -f ~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/$BASENAME/enc_dependencies_$BASENAME-merged.dat ; date
-
-#
-# ANALYZE GRAPH USING NETWORKX 
-#
-# FULL, MERGED GRAPH
-
-# ./30_create_dependency_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-merged.csv dependencies_$BASENAME-merged versions_$BASENAME.csv 0.0
-# ./32_create_largest_component.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-merged
-
-# ./30_create_dependency_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-merged.csv dependencies_$BASENAME-merged versions_$BASENAME.csv 0.01
-# ./32_create_largest_component.py $BASEDIR/$BASENAME/ sampled-0.01_dependencies_$BASENAME-merged
-# ./80_analyze_graph.py \
-#   $BASEDIR/$BASENAME/ \
-#   sampled-0.01_dependencies_$BASENAME-merged
-
-# ./30_create_dependency_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-merged.csv dependencies_$BASENAME-merged versions_$BASENAME.csv 0.1
-# ./32_create_largest_component.py $BASEDIR/$BASENAME/ sampled-0.1_dependencies_$BASENAME-merged
-# ./80_analyze_graph.py \
-#   $BASEDIR/$BASENAME/ \
-#   sampled-0.1_dependencies_$BASENAME-merged
-
-# ./30_create_dependency_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-merged.csv dependencies_$BASENAME-merged versions_$BASENAME.csv 0.4
-# ./32_create_largest_component.py $BASEDIR/$BASENAME/ sampled-0.4_dependencies_$BASENAME-merged
-# ./80_analyze_graph.py \
-#   $BASEDIR/$BASENAME/ \
-#   sampled-0.4_dependencies_$BASENAME-merged
-
-# ./30_create_dependency_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-merged.csv dependencies_$BASENAME-merged versions_$BASENAME.csv
-# ./32_create_largest_component.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-merged
-# ./80_analyze_graph.py \
-#   $BASEDIR/$BASENAME/ \
-#   dependencies_$BASENAME-merged
+# ./31_create_dependency_graph-projects.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-projects.csv dependencies_$BASENAME-projects  0.0
 
 #
 # PREPARE COVARIATES
 #
-python3 50_prepare_covariates.py ~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/Cargo/covariates/ Cargo_project_metadata.csv covariates_maintainers-1.csv
-# python 51_prepare_covariates-contributors.py ~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/Cargo/covariates/ Contributor_commits.csv covariates-contributors-1.csv
+# NOTES: 
+# 1. Cargo_project_metadata.csv was created using a scraper of the libraries.io website.
+# 2. 50_prepare_covariates.py generates files necessary for repo-dependency graph
+#
+# python3 50_prepare_covariates.py $BASEDIR/Cargo/covariates/ Cargo_project_metadata.csv covariates_maintainers-1.csv
+#./51_prepare_covariates-contributors.py $BASEDIR/Cargo/covariates/ Contributor_commits.csv covariates-contributors-1.csv
+
+#
+# ANALYZE VERSION / PROJECT / REPO DEPENDENCY GRAPH USING NETWORKX 
+#
+
+# ./80_analyze_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-merged
+# ./80_analyze_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-projects
+# ./81_analyze_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo-nomissing

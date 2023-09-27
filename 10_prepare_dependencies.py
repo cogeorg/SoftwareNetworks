@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/local/bin/python3
 # -*- coding: utf-8 -*-
 
 __author__="""Co-Pierre Georg (co-pierre.georg@uct.ac.za)"""
@@ -17,7 +17,7 @@ import datetime
 # -------------------------------------------------------------------------
 def do_run(base_directory, input_file_name, output_file_name, repo):
 
-    out_text = "Project ID;Project Name;Version Number;Dependency Requirements;Dependency Project ID\n"
+    out_text = "Project ID;Project Name;Version Number;Dependency Project ID;Dependency Requirements\n"
     out_file = open(base_directory + output_file_name, 'w')
     out_file.write(out_text)
     out_file.close() # ensure file is empty
@@ -36,7 +36,7 @@ def do_run(base_directory, input_file_name, output_file_name, repo):
             tokens = line.strip().split(",")
             if tokens[1] == repo or tokens[1] == repo.upper() or tokens[1] == repo.lower():
                 try:
-                    out_file.write(tokens[3] + ";" + tokens[2] + ";" + tokens[4] + ";" + tokens[10] + ";" + tokens[11] + "\n")
+                    out_file.write(tokens[3] + ";" + tokens[2] + ";" + tokens[4] + ";" + tokens[11] + ";" + tokens[10] + "\n")
                     _found += 1
                 except UnicodeEncodeError:  # very rare, but possible
                     print("      << UNICODE ERROR LINE: " + str(_count))
