@@ -37,8 +37,14 @@ def do_run(base_directory, identifier):
 
     # components
     # num_weakly_connected_components = nx.number_weakly_connected_components(G)
-    num_connected_components = nx.number_connected_components(G)
-    largest_cc = G.subgraph(max(nx.connected_components(G), key=len))
+    try:
+        num_connected_components = nx.number_connected_components(G)
+    except:
+        num_connected_components = nx.number_weakly_connected_components(G)
+    try:
+        largest_cc = G.subgraph(max(nx.connected_components(G), key=len))
+    except:
+        largest_cc = G.subgraph(max(nx.weakly_connected_components(G), key=len))
     size_largest_cc = len(largest_cc)
     nx.write_gexf(largest_cc, base_directory + identifier + "-lcc.gexf")
     print(str(datetime.datetime.now()) + "    << LARGEST WCC HAS # NODES: " + str(size_largest_cc))

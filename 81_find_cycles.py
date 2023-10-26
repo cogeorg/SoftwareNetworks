@@ -20,6 +20,7 @@ import networkx as nx
 def do_run(base_directory, identifier):
     input_filename = base_directory + identifier + ".gexf"
     output_filename = base_directory + "analysis_" + identifier + ".csv"
+    out_text = ""
 
     print("<<<<<< WORKING ON: " + input_filename)
     
@@ -31,25 +32,19 @@ def do_run(base_directory, identifier):
     num_edges = G.number_of_edges()
     
     print(str(datetime.datetime.now()) + "    << # NODES: " + str(num_nodes) + " # EDGES: " + str(num_edges))
-    if nx.is_directed_acyclic_graph(G):
-        print("    << WARNING: GRAPH IS A DAG")
-
-    out_text = "id_node;in_degree;out_degree;katz_centrality;ev_centrality;indeg_centrality\n"
-    katz_centralities = nx.katz_centrality_numpy(G) # , max_iter=1000, tol=1e-06
-    ev_centralities = nx.eigenvector_centrality_numpy(G, max_iter=1000, tol=1e-06)
-    indeg_centralities = nx.in_degree_centrality(G)
-
-    for node in G.nodes():
-        out_text += str(node) + ";" + str(G.in_degree(node)) + ";" + str(G.out_degree(node))
-        out_text += ";" + str(katz_centralities[node]) + ";" + str(ev_centralities[node]) + ";" + str(indeg_centralities[node])
-        out_text += "\n"
+    # if nx.is_directed_acyclic_graph(G):
+    #     print(str(datetime.datetime.now()) + "    << WARNING: GRAPH IS A DAG")
+    if False:
+        print(G.edges())
+    cycles = nx.simple_cycles(G)
+    for entry in cycles:
+        out_text += str(entry) + "\n"
 
     out_file = open(output_filename, "w")
     out_file.write(out_text)
     out_file.close()
-    print("  >> FILES WRITTEN TO:" + output_filename)
-
-    print(">>>>>> FINISHED")
+    
+    print(str(datetime.datetime.now())+ "  >>>>>> FINISHED: ")
 # -------------------------------------------------------------------------
 
 
