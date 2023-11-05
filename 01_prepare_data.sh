@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
+# BASEDIR=~/Downloads/
 # BASEDIR=~/Dropbox/Papers/10_WorkInProgress/SoftwareProductionNetworks/Data/
-BASEDIR=~/Downloads/
+BASEDIR=~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data
 GITDIR=~/Git/SoftwareProductionNetworks/
 
 # ###########################################################################
@@ -53,16 +54,15 @@ DEPFILE=dependencies_$BASENAME.csv
 #
 # CREATE REPO-DEPENDENCY GRAPH
 #
-
-# Note: for large networks, sampling might be helpful. The last number is the sampling probability.
-# TODO: sampling not yet implemented for 1.6.0
+# FIRST: RUN CARGO PART OF 51_prepare_dependencies.do 
 # ./30_create_dependency_graph-1.6.0.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo2.csv dependencies_$BASENAME-repo2 0.0
 
 #
 # ANALYZE DEPENDENCY GRAPH
 # 
 # ./80_analyze_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo2
-# ./81_analyze_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo2-lcc
+# CREATE CENTRALITIES USING GEPHI WITH THE LCC FILE
+# ./81_analyze_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo2-lcc  # TODO: CRASHES SOMETIMES FOR LARGE NETWORKS (~1M EDGES); IN THAT CASE, USE GEPHI
 
 
 # ###########################################################################
@@ -115,17 +115,65 @@ DEPFILE=dependencies_$BASENAME.csv
 #
 # CREATE REPO-DEPENDENCY GRAPH
 #
+# FIRST: RUN PYPI PART OF 51_prepare_dependencies.do 
+# ./30_create_dependency_graph-1.6.0.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo2.csv dependencies_$BASENAME-repo2 0.0
 
+#
+# ANALYZE DEPENDENCY GRAPH
+# 
+./80_analyze_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo2
+# CREATE CENTRALITIES USING GEPHI WITH THE LCC FILE
+# ./81_analyze_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo2-lcc  # TODO: CRASHES SOMETIMES FOR LARGE NETWORKS (~1M EDGES); IN THAT CASE, USE GEPHI
+
+
+
+# ###########################################################################
+#
+# PRODUCTION RUN 1.6.0 -- CRAN
+#
+# ###########################################################################
+VERSION=1.6.0-2020-01-12
+BASENAME=Cran
+LANGUAGE=r
+DEPFILE=dependencies_$BASENAME.csv
+
+#
+# STEP 1 -- PREPARE ORIGINAL DATA
+#
+# USES libraries-1.6.0-2020-01-12.tar.gz
+#
+
+# ./10_prepare_repositories-1.6.0.py \
+#   $BASEDIR \
+#   libraries-$VERSION/repositories-$VERSION.csv \
+#   $BASENAME/repositories_$BASENAME.csv \
+#   $LANGUAGE
+
+# ./10_prepare_projects-1.6.0.py \
+#   $BASEDIR \
+#   libraries-$VERSION/projects-$VERSION.csv \
+#   $BASENAME/projects_$BASENAME.csv \
+#   $BASENAME
+
+# ON REPO LEVEL
+# ./10_prepare_dependencies-1.6.0.py \
+#   /Volumes/Transcend/Data/ \
+#   libraries-$VERSION/repository_dependencies-$VERSION.csv \
+#   $BASENAME/repo_dependencies_$BASENAME.csv \
+#   $BASENAME
+# cp /Volumes/Transcend/Data/$BASENAME/repo_dependencies_$BASENAME.csv $BASEDIR/$BASENAME 
+
+#
+# CREATE REPO-DEPENDENCY GRAPH
 # Note: for large networks, sampling might be helpful. The last number is the sampling probability.
 # TODO: sampling not yet implemented for 1.6.0
-# ./30_create_dependency_graph-1.6.0.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo.csv dependencies_$BASENAME-repo 0.0 
 # ./30_create_dependency_graph-1.6.0.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo2.csv dependencies_$BASENAME-repo2 0.0
 
 #
 # ANALYZE DEPENDENCY GRAPH
 # 
 # ./80_analyze_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo2
-./81_analyze_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo2-lcc
+# ./81_analyze_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo2-lcc  # TODO: CRASHES SOMETIMES; IN THAT CASE, USE GEPHI
 
 
 # ###########################################################################

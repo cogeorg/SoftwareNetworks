@@ -46,7 +46,10 @@ def do_run(base_directory, identifier):
     except:
         largest_cc = G.subgraph(max(nx.weakly_connected_components(G), key=len))
     size_largest_cc = len(largest_cc)
+    
     nx.write_gexf(largest_cc, base_directory + identifier + "-lcc.gexf")
+    nx.write_edgelist(largest_cc, base_directory + identifier + "-lcc.edgelist")
+
     print(str(datetime.datetime.now()) + "    << LARGEST WCC HAS # NODES: " + str(size_largest_cc))
 
     if compute_deg_dist:

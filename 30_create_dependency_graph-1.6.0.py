@@ -19,11 +19,8 @@ import networkx as nx
 # do_run(file_name)
 # -------------------------------------------------------------------------
 def do_run(base_directory, input_file_name, output_identifier, sample_size):
-    G = nx.DiGraph()
-    # H = nx.DiGraph()
-
     print(str(datetime.datetime.now()) + " <<<<<< START WORKING ON: " + base_directory + input_file_name + " USING _NO_ SAMPLE SIZE: " + str(sample_size))
-    G = nx.read_edgelist(base_directory + input_file_name, delimiter=";")
+    G = nx.read_edgelist(base_directory + input_file_name, delimiter=";", create_using=nx.DiGraph)
 
     if True:  # debugging
         print("    << " + str(datetime.datetime.now()) + " G: # Nodes: " + str(len(G.nodes())) + " # Edges: " + str(len(G.edges())))
@@ -32,7 +29,8 @@ def do_run(base_directory, input_file_name, output_identifier, sample_size):
         print("    << " + str(datetime.datetime.now()) + " H: # Nodes: " + str(len(H.nodes())) + " # Edges: " + str(len(H.edges())))
     #     nx.write_gexf(H, base_directory + "sampled-" + str(sample_size) + "_" + output_identifier + ".gexf")
     else:
-        nx.write_gexf(G, base_directory + output_identifier + ".gexf")
+        nx.write_gexf(G, base_directory + output_identifier + ".gexf")  # TODO: FOR SOME REASON THE SOURCE INDICATED THE REFERENCED PACKAGE, NOT THE REFERENCING PACKAGE
+        print("    << " + str(datetime.datetime.now()) + " FILE WRITTEN TO " + base_directory + output_identifier + ".gexf")
 
     print(str(datetime.datetime.now()) + " >>>>>> FINISHED")
 # -------------------------------------------------------------------------

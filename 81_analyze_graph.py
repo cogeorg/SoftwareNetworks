@@ -8,7 +8,8 @@ import datetime
 import random
 
 import networkx as nx
-
+import numpy as np
+from scipy.sparse.linalg import eigsh
 
 # ###########################################################################
 # METHODS
@@ -25,6 +26,9 @@ def do_run(base_directory, identifier):
     
     G = nx.read_gexf(input_filename)  # this is an undirected graph and had to be manually changed to directed
     # print(nx.adjacency_spectrum(G))
+    A = np.matrix(nx.adjacency_matrix(G).toarray())
+    max_eig, _ = eigsh(A, k=1, which='LA', maxiter=100)
+    print("    << FINISHED COMPUTING LARGEST EIGENVALUE")
 
     # nodes, edges
     num_nodes = G.number_of_nodes()
@@ -35,8 +39,8 @@ def do_run(base_directory, identifier):
         print("    << WARNING: GRAPH IS A DAG")
 
     out_text = "id_node;in_degree;out_degree;katz_centrality;ev_centrality;indeg_centrality\n"
-    katz_centralities = nx.katz_centrality_numpy(G) # , max_iter=1000, tol=1e-06
-    ev_centralities = nx.eigenvector_centrality_numpy(G, max_iter=1000, tol=1e-06)
+    katz_centralities = nx.katz_centrality(G, alpha = 1/(max_eig+1.0),max_iter = 10000) # 
+    ev_centralities = nx.eigenvector_centrality(G, max_iter=1000, tol=1e-06)
     indeg_centralities = nx.in_degree_centrality(G)
 
     for node in G.nodes():

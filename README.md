@@ -19,3 +19,4 @@ Production/
 + dependencies-restricted/
 ```
 Where `libraries-1.4.0-2018-12-22/` contains the raw data, `test1/` contains sample data for the first step of debugging, and `npm/` contains our processed dataset, including `enc_sampled-x_dependencies_npm-merged.dat` files, where `x` indicates what percentage of the full dataset has been sampled. These files are used primarily for testing and debugging on realistic but more manageable small datasets.
+
