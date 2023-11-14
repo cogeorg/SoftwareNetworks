@@ -1,25 +1,23 @@
 cd ~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/Cargo/
 
-use tmp_10_popularity_centrality-repo.dta, clear
+// insheet using deghist_dependencies_Cargo-repo2.csv, delimiter(";") clear
 
+use 10_popularity_centrality-repo.dta, clear
 	// table for most central projects
 	gsort - in_degree
 
-	order projectname ev_centrality pagerank Popularity Size NumContributors
-	keep projectname ev_centrality pagerank Popularity Size NumContributors
+	order projectname ev_centrality in_degree pagerank Popularity Size NumContributors
+	keep  projectname ev_centrality in_degree pagerank Popularity Size NumContributors
 	keep in 1/10
 	
 	texsave using 5_centralities_list.tex, replace
-	
-cd ~/Dropbox/Papers/10_WorkInProgress/SoftwareProductionNetworks/Data/Cargo/covariates
-use ../10_popularity_centrality-projects.dta, clear
+
+use 10_popularity_centrality-repo.dta, clear
 	// table for most popular projects
 	gsort - Popularity
-	drop if Size == 978321408 // drop rust language repositories
-	drop if Size == 4383047
 	
-	order name_project degree ev_centrality deg_centrality Popularity Size NumContributors NumReleases
-	keep name_project degree ev_centrality deg_centrality Popularity Size NumContributors NumReleases
+	order projectname ev_centrality in_degree pagerank Popularity Size NumContributors
+	keep  projectname ev_centrality in_degree pagerank Popularity Size NumContributors
 	keep in 1/10
 	
 	texsave using 5_popularity_list.tex, replace

@@ -9,8 +9,8 @@ import random
 
 import networkx as nx
 
-compute_deg_dist = False
-compute_assortativity = False
+compute_deg_dist = True
+compute_assortativity = True
 compute_clustering = False
 compute_centralities = False
 

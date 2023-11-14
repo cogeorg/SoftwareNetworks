@@ -32,17 +32,17 @@ DEPFILE=dependencies_$BASENAME.csv
 #   $BASENAME/projects_$BASENAME.csv \
 #   $BASENAME
 
-# ON PROJECT LEVEL
-# ./11_prepare_dependencies-1.6.0.py \
-#   $BASEDIR \
-#   libraries-$VERSION/dependencies-$VERSION.csv \
-#   $BASENAME/dependencies_$BASENAME.csv \
-#   $BASENAME
 # ON REPO LEVEL
 # ./10_prepare_dependencies-1.6.0.py \
 #   /Volumes/Transcend/Data/ \
 #   libraries-$VERSION/repository_dependencies-$VERSION.csv \
 #   $BASENAME/repo_dependencies_$BASENAME.csv \
+#   $BASENAME
+# DEPRECATED -- ON PROJECT LEVEL
+# ./11_prepare_dependencies-1.6.0.py \
+#   $BASEDIR \
+#   libraries-$VERSION/dependencies-$VERSION.csv \
+#   $BASENAME/dependencies_$BASENAME.csv \
 #   $BASENAME
 # TEST
 # ./10_prepare_dependencies-1.6.0.py \
@@ -60,7 +60,7 @@ DEPFILE=dependencies_$BASENAME.csv
 #
 # ANALYZE DEPENDENCY GRAPH
 # 
-# ./80_analyze_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo2
+./80_analyze_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo2
 # CREATE CENTRALITIES USING GEPHI WITH THE LCC FILE
 # ./81_analyze_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo2-lcc  # TODO: CRASHES SOMETIMES FOR LARGE NETWORKS (~1M EDGES); IN THAT CASE, USE GEPHI
 
@@ -121,7 +121,7 @@ DEPFILE=dependencies_$BASENAME.csv
 #
 # ANALYZE DEPENDENCY GRAPH
 # 
-./80_analyze_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo2
+# ./80_analyze_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo2
 # CREATE CENTRALITIES USING GEPHI WITH THE LCC FILE
 # ./81_analyze_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo2-lcc  # TODO: CRASHES SOMETIMES FOR LARGE NETWORKS (~1M EDGES); IN THAT CASE, USE GEPHI
 
