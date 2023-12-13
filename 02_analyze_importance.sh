@@ -8,7 +8,8 @@
 GITDIR=~/git/SoftwareNetworks/
 BASEDIR=~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/
 BASENAME=Cargo
-FILENAME=test_fast_gnp_1000_0.03
+# FILENAME=test_fast_gnp_1000_0.03
+FILENAME=dependencies_Cargo-repo2-matched-lcc
 
 #
 # GENERATE RANDOM NETWORKS
@@ -31,9 +32,9 @@ FILENAME=test_fast_gnp_1000_0.03
 #   $FILENAME
 
 # CHECK FOR CYCLES -- RUNS SOMETIMES OUT OF MEMORY
-# ./81_find_cycles.py \
-#   $BASEDIR/$BASENAME/ \
-#   $FILENAME
+./81_find_cycles.py \
+  $BASEDIR/$BASENAME/ \
+  $FILENAME
 
 # COMPUTE IMPORTANCE
 # ./200_compute_importance.py \

@@ -9,11 +9,6 @@ import random
 
 import networkx as nx
 
-compute_deg_dist = True
-compute_assortativity = True
-compute_clustering = False
-compute_centralities = False
-
 # ###########################################################################
 # METHODS
 # ###########################################################################
@@ -21,7 +16,9 @@ compute_centralities = False
 # -------------------------------------------------------------------------
 # do_run(file_name)
 # -------------------------------------------------------------------------
-def do_run(base_directory, identifier):
+def do_run(base_directory, identifier, compute_deg_dist, compute_assortativity, compute_clustering, compute_centralities):
+    is_largest_cc = False 
+
     input_filename = base_directory + identifier + ".gexf"
     output_filename = base_directory + "analysis_" + identifier + ".csv"
     cent_filename = base_directory + "centrality_" + identifier + ".csv"
@@ -45,27 +42,33 @@ def do_run(base_directory, identifier):
         largest_cc = G.subgraph(max(nx.connected_components(G), key=len))
     except:
         largest_cc = G.subgraph(max(nx.weakly_connected_components(G), key=len))
-    size_largest_cc = len(largest_cc)
     
-    nx.write_gexf(largest_cc, base_directory + identifier + "-lcc.gexf")
-    nx.write_edgelist(largest_cc, base_directory + identifier + "-lcc.edgelist")
-
+    size_largest_cc = len(largest_cc)
     print(str(datetime.datetime.now()) + "    << LARGEST WCC HAS # NODES: " + str(size_largest_cc))
+    if size_largest_cc == num_nodes:
+        is_largest_cc = True
+    
+    if not is_largest_cc:  # only write out when we are not working on largest CC
+        nx.write_gexf(largest_cc, base_directory + identifier + "-lcc.gexf")
+        nx.write_edgelist(largest_cc, base_directory + identifier + "-lcc.edgelist")
 
     if compute_deg_dist:
         # degree (distributions)
         deghist = nx.degree_histogram(G)
-        deghist_lcc = nx.degree_histogram(largest_cc)
+        if not is_largest_cc:
+            deghist_lcc = nx.degree_histogram(largest_cc)
+
         # average degree
         _avg_degree = 0
         for node in G.nodes():
             _avg_degree += nx.degree(G, node)
         avg_degree = float(_avg_degree) / num_nodes 
 
-        _avg_degree = 0
-        for node in G.nodes():
-            _avg_degree += nx.degree(G, node)
-        avg_degree_lcc = float(_avg_degree) / size_largest_cc 
+        try:
+            diameter = nx.diameter(G)
+        except:
+            diameter = -1
+            
 
         # entire network
         deg_text = ""
@@ -76,29 +79,34 @@ def do_run(base_directory, identifier):
         deg_file.write(deg_text)
         deg_file.close()
 
-        # largest connected component
-        deg_text = ""
-        for deg in deghist_lcc:
-            deg_text += str(deg) + ";"
-
-        deg_file = open(base_directory + "deghist_" + identifier + "-lcc.csv", "w")
-        deg_file.write(deg_text)
-        deg_file.close()
+        if not is_largest_cc: # only if we're not working on largest cc already
+            deg_text = ""
+            for deg in deghist_lcc:
+                deg_text += str(deg) + ";"
+            deg_file = open(base_directory + "deghist_" + identifier + "-lcc.csv", "w")
+            deg_file.write(deg_text)
+            deg_file.close()
 
         print(str(datetime.datetime.now()) + "    << FINISHED COMPUTING DEGREE DISTRIBUTIONS")
 
     # ASSORTATIVITY
     if compute_assortativity:
         assort = nx.degree_assortativity_coefficient(G)
-        assort_lcc = nx.degree_assortativity_coefficient(largest_cc)
+        if not is_largest_cc:
+            assort_lcc = nx.degree_assortativity_coefficient(largest_cc)
 
         print(str(datetime.datetime.now()) + "    << FINISHED COMPUTING ASSORTATIVITY")
 
     # CLUSTERING, PATH LENGTH
     if compute_clustering:
-        avg_shortest_path_length = nx.average_shortest_path_length(largest_cc)
-        avg_clustering = nx.average_clustering(largest_cc)
-        print(str(datetime.datetime.now()) + "    << FINISHED COMPUTING CLUSTERING + PATH LENGTH")
+        if is_largest_cc:
+            avg_shortest_path_length = nx.average_shortest_path_length(G)
+            avg_clustering = nx.average_clustering(G)
+            print(str(datetime.datetime.now()) + "    << FINISHED COMPUTING CLUSTERING + PATH LENGTH")
+        else:
+            avg_shortest_path_length = nx.average_shortest_path_length(largest_cc)
+            avg_clustering = nx.average_clustering(largest_cc)
+            print(str(datetime.datetime.now()) + "    << FINISHED COMPUTING CLUSTERING + PATH LENGTH")
 
     # CENTRALITIES FOR EACH NODE
     if compute_centralities:
@@ -134,16 +142,15 @@ def do_run(base_directory, identifier):
     print(str(datetime.datetime.now()) + "  << COMPLETED NETWORK ANALYSIS")
 
     if compute_deg_dist:
-        out_text = "num_nodes;num_edges;num_conn_comp;size_largest_cc;avg_degree;avg_degree-lcc;assort;assort-lcc"
+        out_text = "num_nodes;num_edges;num_conn_comp;size_largest_cc;avg_degree;assort;diameter;"
         if compute_clustering:
-            out_text += ";avg_shortest_path_length-lcc;average_clustering-lcc"
+            out_text += ";avg_shortest_path_length;average_clustering"
         if compute_centralities:
-            out_text += ";deg_cent-lcc;ev_cent-lcc"
+            out_text += ";deg_cent;ev_cent"
         out_text += "\n"
 
         out_text += str(num_nodes) + ";" + str(num_edges) + ";" \
-            + str(num_connected_components) + ";" + str(size_largest_cc) + ";" + str(round(avg_degree,2)) + ";" + str(round(avg_degree_lcc,2)) + ";" \
-            + str(assort) + ";" + str(assort_lcc)
+            + str(num_connected_components) + ";" + str(size_largest_cc) + ";" + str(round(avg_degree,2)) + ";" + str(assort) + ";" + str(diameter)
         if compute_clustering:
             out_text += ";" + str(avg_shortest_path_length) + ";" + str(avg_clustering)
         if compute_centralities:
@@ -166,7 +173,7 @@ def do_run(base_directory, identifier):
         print("  >> CENTRALITIES WRITTEN TO:" + cent_filename)
 
     if compute_deg_dist:
-        print("  >> FILES WRITTEN TO:" + base_directory + output_filename)
+        print("  >> FILES WRITTEN TO:" + output_filename)
 
     print(">>>>>> FINISHED")
 # -------------------------------------------------------------------------
@@ -185,7 +192,25 @@ if __name__ == '__main__':
     base_directory = args[1]
     identifier = args[2]
     
+    if args[3] == "True":
+        compute_deg_dist = True
+    else:
+        compute_deg_dist = False
+    if args[4] == "True":
+        compute_assortativity = True
+    else:
+        compute_assortativity = False
+    if args[5] == "True":
+        compute_clustering = True
+    else:
+        compute_clustering = False
+    if args[6] == "True":
+        compute_centralities = True
+    else:
+        compute_centralities = False
+
+ 
 #
 # CODE
 #
-    do_run(base_directory, identifier)
+    do_run(base_directory, identifier, compute_deg_dist, compute_assortativity, compute_clustering, compute_centralities)

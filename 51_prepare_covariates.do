@@ -19,6 +19,15 @@ insheet using "repositories_Cargo.csv", delimiter(";") names clear
 	destring numcontributors, replace
 
 	destring repoid, replace
+	
+	rename size Size
+	rename numcontributors NumContributors
+	
+	drop if Size == 0  // some packages have zero size
+	rename numstars Popularity
+	drop if Popularity > 50000 // alternative, cuts only the largest value and missing values
+	rename numforks NumForks 
+	rename numwatchers NumWatchers
 save "repositories_Cargo.dta", replace
 
 // projects
@@ -67,10 +76,32 @@ save repo_match_dependencies_Cargo2.dta, replace
 	duplicates drop
 outsheet using "dependencies_Cargo-repo2.csv", delimiter(";") nonames replace
 save "dependencies_Cargo-repo2.dta", replace // 1,023,801 obs
-// RUN ./30_create_dependency_graph-1.6.0.py TO CREATE .GEXF FILE
+// It is possible to run ./30_create_dependency_graph-1.6.0.py to create a .gexf file at this point already,
+// but this file would include nodes for which we don't have covariate data.
+
+use dependencies_Cargo-repo2.dta, clear
+	rename from_repo_name repoid
+merge m:1 repoid using repositories_Cargo.dta
+	rename repoid from_repo_name
+	keep if _merge == 3
+	drop _merge 
+	
+	rename to_repo_name repoid
+merge m:1 repoid using repositories_Cargo.dta
+	rename repoid to_repo_name
+	keep if _merge == 3
+	drop _merge 
+
+	keep to_repo_name from_repo_name
+	duplicates drop
+	
+	drop if to_repo_name == from_repo_name  // to remove self-loops, we lose 1,404 observations TODO check which packages and why we lose them
+outsheet using "dependencies_Cargo-repo2-matched.csv", delimiter(";") nonames replace
+save "dependencies_Cargo-repo2-matched.dta", replace // 759,141 obs
+
 
 // INTERLUDE: generate unique IDs for each repo, ensuring that they are the same for both to and from repos
-use dependencies_Cargo-repo2.dta, clear
+use dependencies_Cargo-repo2-matched.dta, clear
 	rename from_repo_name repo_name 
 	drop to_repo_name
 save tmp_repo_id.dta, replace
@@ -84,7 +115,7 @@ append using tmp_repo_id.dta
 save id_repo_name.dta, replace
 
 // MERGE newly generated unique to dependencies
-use dependencies_Cargo-repo2.dta, clear
+use dependencies_Cargo-repo2-matched.dta, clear
 	rename from_repo_name repo_name
 merge m:1 repo_name using id_repo_name.dta
 	keep if _merge == 3
@@ -108,7 +139,7 @@ outsheet using dependencies_Cargo-repo3.csv, delimiter(";") replace // 102,981 o
 //
 // PREPARE CENTRALITIES -- ONCE GEPHI COMPUTES Average Degree, PageRank (0.85, 0.001), Eigenvector Centrality (Directed, 100 iterations)
 //
-insheet using gephi_analysis_dependencies_Cargo-repo2-lcc.csv, clear nonames
+insheet using gephi_analysis_dependencies_Cargo-repo2-matched-lcc.csv, clear nonames
 	drop v2 v3
 	rename v1 repo_name 
 	rename v4 in_degree
@@ -117,7 +148,7 @@ insheet using gephi_analysis_dependencies_Cargo-repo2-lcc.csv, clear nonames
 	rename v7 pagerank
 	rename v8 ev_centrality
 	sort repo_name
-save analysis_dependencies_Cargo-repo2-lcc.dta, replace
+save analysis_dependencies_Cargo-repo2-matched-lcc.dta, replace
 
 
 //
@@ -129,19 +160,11 @@ use repositories_Cargo.dta, clear
 	rename repoid repo_name
 	sort repo_name
 
-merge 1:1 repo_name using analysis_dependencies_Cargo-repo2-lcc.dta
-	keep if _merge == 3 // we lose 22,005 out of 70,090 observations
+merge 1:1 repo_name using analysis_dependencies_Cargo-repo2-matched-lcc.dta  // using the matched version with 33k nodes
+	keep if _merge == 3
 	drop _merge
 
-	rename size Size
-	rename numcontributors NumContributors
-	
-	drop if Size == 0  // some packages have zero size
-	rename numstars Popularity
-	drop if Popularity > 50000 // alternative, cuts only the largest value and missing values
-	rename numforks NumForks 
-	rename numwatchers NumWatchers
-save 10_popularity_centrality-repo.dta, replace
+save 10_popularity_centrality-repo2-matched.dta, replace
 
 //
 // INTERLUDE -- ANALYZE MASTER DATA
@@ -204,12 +227,19 @@ save tmp_10_popularity_centrality-repo.dta, replace
 //
 // NOW CONTINUE TO CREATE MASTER DATASET FOR CATEGORICAL VARIABLES
 //
-use 10_popularity_centrality-repo.dta, clear
+use 10_popularity_centrality-repo2-matched.dta, clear
 merge m:1 repo_name using id_repo_name.dta
 	keep if _merge == 3
 	drop _merge 
 	
-	local varlist Size Popularity NumForks NumWatchers NumContributors in_degree out_degree pagerank ev_centrality  // Add your variable names here
+	gen created = substr(createdtimestamp, 1, 10)
+	gen created_date = date(created, "YMD")
+	drop created
+	gen reference_date = mdy(1, 13, 2020)
+	gen Maturity = reference_date - created_date
+	format created_date %td
+	
+	local varlist Size Popularity NumForks NumWatchers NumContributors Maturity in_degree out_degree pagerank ev_centrality  // Add your variable names here
 
 	foreach var in `varlist' {
 		* Create quartiles using the "xtile" command
@@ -225,8 +255,9 @@ merge m:1 repo_name using id_repo_name.dta
 		drop quartile
 	}
 	order id_repo repo_name
-save 20_master_Cargo.dta, replace
-outsheet using 20_master_Cargo.csv, delimiter(";") replace
+	
+save 20_master_Cargo-matched.dta, replace
+outsheet using 20_master_Cargo-matched.csv, delimiter(";") replace  // 35,274 nodes
 
 	
 // ============================================================================

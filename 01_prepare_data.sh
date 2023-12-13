@@ -55,12 +55,12 @@ DEPFILE=dependencies_$BASENAME.csv
 # CREATE REPO-DEPENDENCY GRAPH
 #
 # FIRST: RUN CARGO PART OF 51_prepare_dependencies.do 
-# ./30_create_dependency_graph-1.6.0.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo2.csv dependencies_$BASENAME-repo2 0.0
+# ./30_create_dependency_graph-1.6.0.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo2-matched.csv dependencies_$BASENAME-repo2-matched 0.0
 
 #
 # ANALYZE DEPENDENCY GRAPH
 # 
-./80_analyze_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo2
+./80_analyze_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo2-matched True True False False 
 # CREATE CENTRALITIES USING GEPHI WITH THE LCC FILE
 # ./81_analyze_graph.py $BASEDIR/$BASENAME/ dependencies_$BASENAME-repo2-lcc  # TODO: CRASHES SOMETIMES FOR LARGE NETWORKS (~1M EDGES); IN THAT CASE, USE GEPHI
 

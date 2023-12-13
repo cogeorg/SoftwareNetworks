@@ -2,31 +2,41 @@ cd ~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/Cargo/
 
 // insheet using deghist_dependencies_Cargo-repo2.csv, delimiter(";") clear
 
-use 10_popularity_centrality-repo.dta, clear
+use 20_master_Cargo-matched.dta, clear	
+	// some summary stats
+	su ev_centrality, detail
+	su pagerank, detail
+	su in_degree, detail
+	su out_degree, detail
+	
+use 20_master_Cargo-matched.dta, clear	
 	// table for most central projects
 	gsort - in_degree
 
+	local vars ev_centrality in_degree pagerank Popularity Size NumContributors 
+	foreach var of local vars {
+		gen `var'_rounded = round(`var', 0.001)
+		drop `var'
+		rename `var'_rounded `var'
+	}
+	
 	order projectname ev_centrality in_degree pagerank Popularity Size NumContributors
 	keep  projectname ev_centrality in_degree pagerank Popularity Size NumContributors
 	keep in 1/10
 	
 	texsave using 5_centralities_list.tex, replace
 
-use 10_popularity_centrality-repo.dta, clear
-	// table for most popular projects
-	gsort - Popularity
+use 20_master_Cargo-matched.dta, clear	
+	 su Size Popularity NumForks NumWatchers NumContributors Maturity
 	
-	order projectname ev_centrality in_degree pagerank Popularity Size NumContributors
-	keep  projectname ev_centrality in_degree pagerank Popularity Size NumContributors
-	keep in 1/10
 	
-	texsave using 5_popularity_list.tex, replace
+// ============================================================================
+//
+// DEPRECATED
+// 
+// ============================================================================
 
-	
-	
-	
-	
-cd ~/Dropbox/Papers/10_WorkInProgress/SoftwareProductionNetworks/Data/Cargo/covariates
+// cd ~/Dropbox/Papers/10_WorkInProgress/SoftwareProductionNetworks/Data/Cargo/covariates
 // // prepare maintainer data
 // use 2_maintainer_github_metadata-full.dta, clear
 // 	bysort maintainer_github_url: egen total_contributions = sum(contributions)
@@ -37,7 +47,7 @@ cd ~/Dropbox/Papers/10_WorkInProgress/SoftwareProductionNetworks/Data/Cargo/cova
 // save 2_maintainer_github_metadata-full-total.dta, replace
 //
 // // prepare mapping
-insheet using Maintainer_GithubID.csv, delimiter(",") clear names
+// insheet using Maintainer_GithubID.csv, delimiter(",") clear names
 //
 // merge m:1 maintainer_github_url using 2_maintainer_github_metadata-full-total.dta
 // 	keep if _merge == 3
@@ -46,12 +56,6 @@ insheet using Maintainer_GithubID.csv, delimiter(",") clear names
 // PROJECT.MAJOR.MINOR.VERSION LEVEL
 // TODO: double check why we have so few matches between centrality and popularity
 
-
-// ============================================================================
-//
-// DEPRECATED
-// 
-// ============================================================================
 
 // // 5_master_covariates_Cargo-merged.dta -- the actual mapping
 // insheet using "key_dependencies_Cargo-merged.dat", delimiter(";") clear   // created by 30_create_dependency_graph.py so that node names can be used in gephi
