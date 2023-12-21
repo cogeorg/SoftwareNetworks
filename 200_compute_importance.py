@@ -46,7 +46,7 @@ def do_run(base_directory, identifier, depth):
 
     print("<<<<<< WORKING ON: " + input_filename)
 
-    G = nx.read_gexf(input_filename).reverse()
+    G = nx.read_gexf(input_filename).reverse()  # TODO: CHECK THAT THIS IS THE RIGHT DIRECTION OF LINKS; LOOKS CORRECT FOR REAL GRAPH, THOUGH
     # H = G.subgraph(max(nx.weakly_connected_components(G), key=len))
     
     num_nodes = G.number_of_nodes()

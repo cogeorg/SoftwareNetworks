@@ -1,7 +1,7 @@
 cd ~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/Cargo/
-
 // insheet using deghist_dependencies_Cargo-repo2.csv, delimiter(";") clear
 
+cd ~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/Cargo/
 use 20_master_Cargo-matched.dta, clear	
 	// some summary stats
 	su ev_centrality, detail
@@ -28,7 +28,24 @@ use 20_master_Cargo-matched.dta, clear
 
 use 20_master_Cargo-matched.dta, clear	
 	 su Size Popularity NumForks NumWatchers NumContributors Maturity
+	 su Size Popularity NumForks NumWatchers NumContributors Maturity, detail
+	 
 	
+//
+// SYSTEMICNESS
+//
+cd ~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/Cargo/
+insheet using "importance_dependencies_Cargo-repo2-matched-lcc.csv", delimiter(";") clear
+	rename v1 repoid
+	drop v2 
+		
+merge 1:1 repoid using repositories_Cargo.dta
+	keep if _merge == 3
+	drop _merge 
+	
+	gsort - v3
+	
+
 	
 // ============================================================================
 //
