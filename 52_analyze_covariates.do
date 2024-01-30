@@ -35,17 +35,56 @@ use 20_master_Cargo-matched.dta, clear
 // SYSTEMICNESS
 //
 cd ~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/Cargo/
-insheet using "importance_dependencies_Cargo-repo2-matched-lcc.csv", delimiter(";") clear
+// forvalues i=2/5 {
+// 	insheet using "importance_dependencies_Cargo-repo2-matched-lcc-`i'.csv", delimiter(";") clear
+// 	rename v1 repoid
+// 	save "importance_dependencies_Cargo-repo2-matched-lcc-`i'.dta", replace
+// }
+//
+
+insheet using "importance_dependencies_Cargo-repo2-matched-lcc-6.csv", delimiter(";") clear
 	rename v1 repoid
-	drop v2 
-		
+	drop v8
+	
 merge 1:1 repoid using repositories_Cargo.dta
 	keep if _merge == 3
 	drop _merge 
 	
-	gsort - v3
+	rename v3 in_degree
+	gsort - in_degree // the one-step systemicness, i.e. in-degree
 	
-
+	drop repoid v2
+	order projectname in_degree
+	rename v4 syst_2
+	rename v5 syst_3
+	rename v6 syst_4
+	rename v7 syst_5
+	
+	keep projectname in_degree syst_*
+	// MANUALLY create table of systemicness 
+	su syst_*, d
+	su syst_*
+	
+	keep in 1/3527
+	
+	// create table of most important repos
+	keep in 1/10
+	texsave using 6_importance_list.tex, replace
+	
+	
+//
+// BETWEENNESS
+//
+insheet using "centrality_dependencies_Cargo-repo2-matched-lcc.csv", delimiter(";") clear
+	rename v1 repoid
+	rename v2 betweenness
+	
+merge 1:1 repoid using repositories_Cargo.dta
+	keep if _merge == 3
+	drop _merge 
+	
+	gsort - betweenness
+	
 	
 // ============================================================================
 //

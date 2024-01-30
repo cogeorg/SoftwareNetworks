@@ -37,7 +37,7 @@ def do_run(base_directory, identifier, depth):
     debug = False
 
     input_filename = base_directory + identifier + ".gexf"
-    output_filename = base_directory + "importance_" + identifier + ".csv"
+    output_filename = base_directory + "importance_" + identifier + "-" + str(depth) + ".csv"
     
     # ensure file is empty
     out_file = open(output_filename, "w")

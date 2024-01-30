@@ -18,9 +18,9 @@ FILENAME=dependencies_Cargo-repo2-matched-lcc
 # ./79_generate_test_networks.py \
 #   $BASEDIR/$BASENAME \
 #   test \
-#   64 \
+#   8000 \
 #   fast_gnp \
-#   0.03
+#   0.003
 
 # # GRAPH ANALYSIS
 # ./80_analyze_graph.py \
@@ -37,12 +37,20 @@ FILENAME=dependencies_Cargo-repo2-matched-lcc
 #   $BASEDIR/$BASENAME/ \
 #   $FILENAME
 
+#
 # COMPUTE IMPORTANCE
-./200_compute_importance.py \
-  $BASEDIR/$BASENAME/ \
-  $FILENAME \
-  6
+#
+# ./200_compute_importance.py \
+#   $BASEDIR/$BASENAME/ \
+#   $FILENAME \
+#   6
 
+# FILENAME=test2
+# FILENAME=test_fast_gnp_8000_0.003
+# FILENAME=dependencies_Cargo-repo2-matched-lcc
+# ./200_compute_importance-centrality.py \
+#   $BASEDIR/$BASENAME/ \
+#   $FILENAME
 
 # ###########################################################################
 #
@@ -52,7 +60,9 @@ FILENAME=dependencies_Cargo-repo2-matched-lcc
 GITDIR=~/git/SoftwareNetworks/
 BASEDIR=~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/
 BASENAME=Cargo
+FILENAME=dependencies_Cargo-repo2-matched-lcc
 
-# ./200_compute_importance.py \
-#   $BASEDIR/$BASENAME/ \
-#   dependencies_$BASENAME-repo2
+./200_compute_importance.py \
+  $BASEDIR/$BASENAME/ \
+  $FILENAME \
+  6
