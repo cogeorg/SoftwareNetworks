@@ -10,6 +10,15 @@ import networkx as nx
 import numpy as np
 from tqdm import tqdm
 
+def compute_ef(G,i):
+    ef = 0.0
+    for j in list(nx.neighbors(G,i)):
+        try:
+            ef += 1.0/len(list(nx.neighbors(G,j)))
+        except ZeroDivisionError:
+            pass
+    return ef
+ 
 # -------------------------------------------------------------------------
 # do_run(file_name)
 # -------------------------------------------------------------------------
@@ -28,7 +37,7 @@ def do_run(base_directory, identifier):
 
     print(str(datetime.datetime.now()) + " <<<<< WORKING ON: " + input_filename)
 
-    G = nx.read_gexf(input_filename).reverse()  # TODO: CHECK THAT THIS IS THE RIGHT DIRECTION OF LINKS; LOOKS CORRECT FOR REAL GRAPH, THOUGH
+    G = nx.read_gexf(input_filename).reverse()
     # H = G.subgraph(max(nx.weakly_connected_components(G), key=len))
     
     num_nodes = G.number_of_nodes()
@@ -45,7 +54,9 @@ def do_run(base_directory, identifier):
     centralities = nx.betweenness_centrality(G, normalized=False)
     # [current_node, p] = random_shock(num_nodes)
     for i in G.nodes():
-        out_text = str(i) + ";" + str(centralities[i])
+        ef = compute_ef(G,i)
+        out_text = str(i) + ";" + str(centralities[i]) + ";" + str(ef) + ";" + str(G.out_degree(i))
+        
 
         if False:
             print(i, ":", str(centralities[i]))
