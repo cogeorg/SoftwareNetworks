@@ -259,7 +259,8 @@ merge m:1 repo_name using id_repo_name.dta
 save 20_master_Cargo-matched.dta, replace
 outsheet using 20_master_Cargo-matched.csv, delimiter(";") replace  // 35,274 nodes
 
-	
+
+
 // ============================================================================
 //
 // Pypi -- 1.6.0
@@ -281,19 +282,27 @@ insheet using "repositories_Pypi.csv", delimiter(";") names clear
 	destring numcontributors, replace
 
 	destring repoid, replace
+	
+	rename size Size
+	rename numcontributors NumContributors
+	
+	drop if Size == 0  // some packages have zero size
+	rename numstars Popularity
+	drop if Popularity > 50000 // alternative, cuts only the largest value and missing values
+	rename numforks NumForks 
+	rename numwatchers NumWatchers
 save "repositories_Pypi.dta", replace
 
 // projects
 insheet using "projects_Pypi.csv", delimiter(";") names clear
 	drop if id == "ID"
 	destring id, replace
+	destring repoid, replace
 save "projects_Pypi.dta", replace
 	rename id projectid
 	keep projectid repoid
 	
 	drop if repoid == ""
-	drop if projectid == 2327647 | projectid == 4745387
-	destring repoid, replace
 save projectid_repoid.dta, replace 
 
 // REPO DEPENDENCIES 
@@ -317,7 +326,7 @@ insheet using repo_dependencies_Pypi.csv, names delimiter(";") clear
 	// match dependencyproject
 // 	drop if projectid == "" | projectid == "runtime" | projectid == "]}" | projectid == "=>true" | projectid == "=>false}"
 // 	destring projectid, replace
-merge m:1 projectid using projectid_repoid.dta  // we lose 1,172,272 obs and match 4,518,057
+merge m:1 projectid using projectid_repoid.dta
 	keep if _merge == 3
 	drop _merge
 
@@ -330,10 +339,31 @@ save repo_match_dependencies_Pypi2.dta, replace
 	duplicates drop
 outsheet using "dependencies_Pypi-repo2.csv", delimiter(";") nonames replace
 save "dependencies_Pypi-repo2.dta", replace // 1,023,801 obs
-// RUN ./30_create_dependency_graph-1.6.0.py TO CREATE .GEXF FILE
+// It is possible to run ./30_create_dependency_graph-1.6.0.py to create a .gexf file at this point already,
+// but this file would include nodes for which we don't have covariate data.
+
+use dependencies_Pypi-repo2.dta, clear
+	rename from_repo_name repoid
+merge m:1 repoid using repositories_Pypi.dta
+	rename repoid from_repo_name
+	keep if _merge == 3
+	drop _merge 
+	
+	rename to_repo_name repoid
+merge m:1 repoid using repositories_Pypi.dta
+	rename repoid to_repo_name
+	keep if _merge == 3
+	drop _merge 
+
+	keep to_repo_name from_repo_name
+	duplicates drop
+	
+	drop if to_repo_name == from_repo_name  // to remove self-loops, we lose 1,404 observations TODO check which packages and why we lose them
+outsheet using "dependencies_Pypi-repo2-matched.csv", delimiter(";") nonames replace
+save "dependencies_Pypi-repo2-matched.dta", replace // 759,141 obs
 
 // INTERLUDE: generate unique IDs for each repo, ensuring that they are the same for both to and from repos
-use dependencies_Pypi-repo2.dta, clear
+use dependencies_Pypi-repo2-matched.dta, clear
 	rename from_repo_name repo_name 
 	drop to_repo_name
 save tmp_repo_id.dta, replace
@@ -347,7 +377,7 @@ append using tmp_repo_id.dta
 save id_repo_name.dta, replace
 
 // MERGE newly generated unique to dependencies
-use dependencies_Pypi-repo2.dta, clear
+use dependencies_Pypi-repo2-matched.dta, clear
 	rename from_repo_name repo_name
 merge m:1 repo_name using id_repo_name.dta
 	keep if _merge == 3
@@ -370,8 +400,9 @@ outsheet using dependencies_Pypi-repo3.csv, delimiter(";") replace // 102,981 ob
 
 //
 // PREPARE CENTRALITIES -- ONCE GEPHI COMPUTES Average Degree, PageRank (0.85, 0.001), Eigenvector Centrality (Directed, 100 iterations)
+// NOTE: Use gephi first
 //
-insheet using gephi_analysis_dependencies_Pypi-repo2-lcc.csv, clear nonames
+insheet using gephi_analysis_dependencies_Pypi-repo2-matched-lcc.csv, clear nonames
 	drop v2 v3
 	rename v1 repo_name 
 	rename v4 in_degree
@@ -380,7 +411,7 @@ insheet using gephi_analysis_dependencies_Pypi-repo2-lcc.csv, clear nonames
 	rename v7 pagerank
 	rename v8 ev_centrality
 	sort repo_name
-save analysis_dependencies_Pypi-repo2-lcc.dta, replace
+save analysis_dependencies_Pypi-repo2-matched-lcc.dta, replace
 
 
 //
@@ -392,87 +423,26 @@ use repositories_Pypi.dta, clear
 	rename repoid repo_name
 	sort repo_name
 
-merge 1:1 repo_name using analysis_dependencies_Pypi-repo2-lcc.dta
-	keep if _merge == 3 // we lose 1,753,428 and keep 293,368 obs
+merge 1:1 repo_name using analysis_dependencies_Pypi-repo2-matched-lcc.dta  // using the matched version with 293k nodes
+	keep if _merge == 3
 	drop _merge
 
-	rename size Size
-	rename numcontributors NumContributors
-	
-	drop if Size == 0  // some packages have zero size
-	rename numstars Popularity
-	drop if Popularity > 50000 // alternative, cuts only the largest value and missing values
-	rename numforks NumForks 
-	rename numwatchers NumWatchers
-save 10_popularity_centrality-repo.dta, replace
+save 10_popularity_centrality-repo2-matched.dta, replace
 
-//
-// INTERLUDE -- ANALYZE MASTER DATA
-//
-// 	winsor2 ev_centrality, replace cuts(0 95) trim
-// 	winsor2 katz_centrality, replace cuts(0 95) trim
-// 	winsor2 indeg_centrality, replace cuts(0,95) trim
-// 	winsor2 in_degree, replace cuts(0,99) trim
-// 	winsor2 out_degree, replace cuts(0,99) trim
-// 	winsor2 NumContributors, replace cuts(0 99) trim
-	
-	// look at most central packages manually
-	gsort - ev_centrality 
-	
-	// simple scatter plot
-	scatter Popularity ev_centrality
-	graph export Pypi_popularity-ev_centrality.jpg, replace
-	
-// 	scatter Popularity katz_centrality
-// 	graph export Pypi_popularity-katz_centrality.jpg, replace
-
-	scatter Popularity pagerank
-	graph export Pypi_popularity-pagerank.jpg, replace
-	
-	label variable in_degree "in-degree"
-	label variable out_degree "out-degree"
-	scatter in_degree out_degree 
-	graph export Pypi_indeg-outdeg.jpg, replace
-	
-	// binscatter
-	winsor2 ev_centrality, replace cuts(0 95) trim
-	binscatter Popularity ev_centrality
-	graph export Pypi_bs_popularity-ev_centrality.jpg, replace
-	
-// 	binscatter Popularity katz_centrality
-// 	graph export pypi_bs_popularity-katz_centrality.jpg, replace
-	
-	winsor2 pagerank, replace cuts(0 95) trim
-	binscatter Popularity pagerank
-	graph export pypi_bs_popularity-pagerank.jpg, replace
-	
-	// number of contributors vs popularity
-	winsor2 Popularity, replace cuts(0 99) trim
-	binscatter NumContributors Popularity
-	graph export Pypi_bs_t99_numcontributors_popularity.jpg, replace
-	
-	binscatter NumContributors ev_centrality
-	graph export Pypi_bs_t99_numcontributors_ev_centrality.jpg, replace
-
-	binscatter NumContributors pagerank
-	graph export Pypi_bs_t99_numcontributors_pagerank.jpg, replace
-
-	// regressions
-	regress Popularity NumContributors
-	regress Popularity ev_centrality
-
-save tmp_10_popularity_centrality-repo.dta, replace
-
-
-//
-// NOW CONTINUE TO CREATE MASTER DATASET FOR CATEGORICAL VARIABLES
-//
-use 10_popularity_centrality-repo.dta, clear
+// ADD CATEGORICAL VARIABLES
+use 10_popularity_centrality-repo2-matched.dta, clear
 merge m:1 repo_name using id_repo_name.dta
 	keep if _merge == 3
 	drop _merge 
 	
-	local varlist Size Popularity NumForks NumWatchers NumContributors in_degree out_degree pagerank ev_centrality  // Add your variable names here
+	gen created = substr(createdtimestamp, 1, 10)
+	gen created_date = date(created, "YMD")
+	drop created
+	gen reference_date = mdy(1, 13, 2020)
+	gen Maturity = reference_date - created_date
+	format created_date %td
+	
+	local varlist Size Popularity NumForks NumWatchers NumContributors Maturity in_degree out_degree pagerank ev_centrality
 
 	foreach var in `varlist' {
 		* Create quartiles using the "xtile" command
@@ -488,8 +458,14 @@ merge m:1 repo_name using id_repo_name.dta
 		drop quartile
 	}
 	order id_repo repo_name
-save 20_master_Pypi.dta, replace
-outsheet using 20_master_Pypi.csv, delimiter(";") replace
+	
+save 20_master_Pypi-matched.dta, replace
+outsheet using 20_master_Pypi-matched.csv, delimiter(";") replace  // 35,274 nodes
+
+
+
+
+
 
 
 // ============================================================================
