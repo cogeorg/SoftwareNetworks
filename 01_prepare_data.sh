@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # BASEDIR=~/Downloads/
-# BASEDIR=~/Dropbox/Papers/10_WorkInProgress/SoftwareProductionNetworks/Data/
-BASEDIR=~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data
+BASEDIR=~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/
 GITDIR=~/Git/SoftwareProductionNetworks/
 
 # ###########################################################################
@@ -39,11 +38,11 @@ DEPFILE=dependencies_$BASENAME.csv
 #   $BASENAME/repo_dependencies_$BASENAME.csv \
 #   $BASENAME
 # DEPRECATED -- ON PROJECT LEVEL
-# ./11_prepare_dependencies-1.6.0.py \
-#   $BASEDIR \
-#   libraries-$VERSION/dependencies-$VERSION.csv \
-#   $BASENAME/dependencies_$BASENAME.csv \
-#   $BASENAME
+./11_prepare_dependencies-1.6.0.py \
+  ~/Downloads/ \
+  libraries-$VERSION/dependencies-$VERSION.csv \
+  $BASENAME/dependencies_$BASENAME.csv \
+  $BASENAME
 # TEST
 # ./10_prepare_dependencies-1.6.0.py \
 #   ~/Downloads/ \

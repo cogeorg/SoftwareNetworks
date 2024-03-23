@@ -464,10 +464,6 @@ outsheet using 20_master_Pypi-matched.csv, delimiter(";") replace  // 35,274 nod
 
 
 
-
-
-
-
 // ============================================================================
 //
 // Cran -- 1.6.0
@@ -881,68 +877,47 @@ outsheet using "covariates/4_projects_cargo.csv", delimiter(",") replace
 // ALTERNATIVE dependency graph based on Cargo.csv obtained from 
 // new scraper (2023-09-13)
 //
-cd ~/Dropbox/Papers/10_WorkInProgress/SoftwareProductionNetworks/Data/Cargo/
+cd ~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/Cargo/
 insheet using "dependencies_Cargo.csv", delimiter(";") names clear
 	rename projectid id_from
 	rename dependencyprojectid id_to
 	keep id*
 duplicates drop
-	drop if id_from == "Project ID"
+	drop if id_from == "ProjectID"
 	destring id*, replace
 	drop if id_from == . | id_to == .
 outsheet using "dependencies_Cargo-projects2.csv", delimiter(";") replace
 save dependencies_Cargo-projects2.dta, replace
 
-cd ~/Dropbox/Papers/10_WorkInProgress/SoftwareProductionNetworks/Data/Cargo/
+cd ~/Dropbox/Papers/10_WorkInProgress/SoftwareNetworks/Data/Cargo/
 insheet using "projects_Cargo.csv", delimiter(";") names clear
-	rename name project_name
-	rename projectid project_id 
-save projects_Pypi.dta, replace
+	rename projectname project_name
+	rename id project_id 
+save projects_Cargo.dta, replace
 	keep project_name project_id
 	duplicates drop
 save project_id_name.dta, replace
 
-insheet using "Cargo.csv", delimiter(";") names clear
-	sort github_repo project package_manager_url
-	order github_repo project package_manager_url
-	drop if github_repo == ""
-	
-	rename project project_name
-merge m:1 project_name using project_id_name.dta 
-	keep if _merge == 3
-	drop _merge
-	
-	keep github_repo project_id 
-	duplicates drop
-	sort github_repo project_id
-	
-	bysort project_id : gen foo = _N
-	drop if foo > 1
-	drop foo
-save github_projectid.dta, replace
+// DEPRECATED
+// insheet using "Cargo.csv", delimiter(";") names clear
+// 	sort github_repo project package_manager_url
+// 	order github_repo project package_manager_url
+// 	drop if github_repo == ""
+//	
+// 	rename project project_name
+// merge m:1 project_name using project_id_name.dta 
+// 	keep if _merge == 3
+// 	drop _merge
+//	
+// 	keep github_repo project_id 
+// 	duplicates drop
+// 	sort github_repo project_id
+//	
+// 	bysort project_id : gen foo = _N
+// 	drop if foo > 1
+// 	drop foo
+// save github_projectid.dta, replace
 
-//
-// ALTERNATIVE: repo-based dependency graph
-//
-use dependencies_Cargo-projects2.dta, clear
-	rename id_from project_id 
-merge m:1 project_id using github_projectid.dta
-	keep if _merge == 3
-	drop _merge 
-	rename project_id id_from 
-	rename github_repo repo_from 
-	
-	rename id_to project_id 
-merge m:1 project_id using github_projectid.dta
-	keep if _merge == 3
-	drop _merge 
-	rename project_id id_to 
-	rename github_repo repo_to 
-	
-	keep repo_from repo_to
-
-	duplicates drop
-save repo_dependencies2.dta, replace
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
