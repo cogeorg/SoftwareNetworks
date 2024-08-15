@@ -53,6 +53,7 @@ def do_run(base_directory, input_file_name, output_file_name, manager):
     out_file = open(base_directory + output_file_name, 'w')
     out_file.write(out_text)
     out_file.close() # ensure file is empty
+
     out_file = open(base_directory + output_file_name, 'a')
 
     print("<<<<<< WORKING ON: " + base_directory + input_file_name)
@@ -84,7 +85,6 @@ def do_run(base_directory, input_file_name, output_file_name, manager):
                 
     # add output
     out_text += "\n"
-    out_file.write(out_text)
     out_file.close()
     print("    >>> FOUND: " + str(_found) + " OF TOTAL: " + str(_count) + " ENTRIES WITH: " + str(_error) + " ERRORS.")
     print("    >>> FILE WRITTEN TO:" + base_directory + output_file_name)

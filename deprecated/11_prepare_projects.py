@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 __author__="""Co-Pierre Georg (co-pierre.georg@uct.ac.za)"""

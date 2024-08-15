@@ -31,6 +31,8 @@ def do_run(base_directory, input_file_name, output_identifier, sample_size):
     else:
         nx.write_gexf(G, base_directory + output_identifier + ".gexf")  # TODO: FOR SOME REASON THE SOURCE INDICATED THE REFERENCED PACKAGE, NOT THE REFERENCING PACKAGE
         print("    << " + str(datetime.datetime.now()) + " FILE WRITTEN TO " + base_directory + output_identifier + ".gexf")
+        nx.write_edgelist(G, base_directory + output_identifier + ".edgelist")  
+        print("    << " + str(datetime.datetime.now()) + " FILE WRITTEN TO " + base_directory + output_identifier + ".edgelist")
 
     print(str(datetime.datetime.now()) + " >>>>>> FINISHED")
 # -------------------------------------------------------------------------

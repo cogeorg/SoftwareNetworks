@@ -26,7 +26,7 @@ def do_run(base_directory, identifier, compute_deg_dist, compute_assortativity, 
     print("<<<<<< WORKING ON: " + input_filename)
     
     G = nx.read_gexf(input_filename)  # this is an undirected graph
-
+    
     # nodes, edges
     num_nodes = G.number_of_nodes()
     num_edges = G.number_of_edges()
@@ -44,25 +44,14 @@ def do_run(base_directory, identifier, compute_deg_dist, compute_assortativity, 
         largest_cc = G.subgraph(max(nx.weakly_connected_components(G), key=len))
     
     size_largest_cc = len(largest_cc)
-    print(str(datetime.datetime.now()) + "    << LARGEST WCC HAS # NODES: " + str(size_largest_cc))    
-    nx.write_gexf(largest_cc, base_directory + identifier + "-lcc.gexf")
-    nx.write_edgelist(largest_cc, base_directory + identifier + "-lcc.edgelist")
-    edges_out_text = ""
-    for u,v in largest_cc.edges():
-        edges_out_text += u + ";" + v + "\n"
-    edges_out_file = open(base_directory + identifier + "-lcc.csv", "w")
-    edges_out_file.write(edges_out_text)
-    edges_out_file.close()
+    print(str(datetime.datetime.now()) + "    << LARGEST WCC HAS # NODES: " + str(size_largest_cc))
+    if size_largest_cc == num_nodes:
+        is_largest_cc = True
+    
+    if not is_largest_cc:  # only write out when we are not working on largest CC
+        nx.write_gexf(largest_cc, base_directory + identifier + "-lcc.gexf")
+        nx.write_edgelist(largest_cc, base_directory + identifier + "-lcc.edgelist")
 
-    nodes_out_text = "repoid\n"
-    for node in largest_cc.nodes():
-        nodes_out_text += node + "\n"
-    nodes_out_file = open(base_directory + identifier + "-nodes-lcc.csv", "w")
-    nodes_out_file.write(nodes_out_text)
-    nodes_out_file.close()
-        
-
-    # DEGREE DISTRIBUTION
     if compute_deg_dist:
         # degree (distributions)
         deghist = nx.degree_histogram(G)
@@ -147,7 +136,8 @@ def do_run(base_directory, identifier, compute_deg_dist, compute_assortativity, 
         # betweenness_centrality = nx.betweenness_centrality(G)
 
         print(str(datetime.datetime.now()) + "    << FINISHED COMPUTING CENTRALITIES")
- 
+
+    
     # DONE
     print(str(datetime.datetime.now()) + "  << COMPLETED NETWORK ANALYSIS")
 
