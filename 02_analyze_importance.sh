@@ -4,7 +4,7 @@ set -euo pipefail
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if [ "${1:-}" = "REPRO" ]; then
-  base_dir="${script_dir}/60_repro/30_data"
+  base_dir="${script_dir}/../60_repro/30_data"
   base_name="Pypi/deprecated"
   identifier="dependencies_Pypi-repo2-matched-lcc"
   depth="6"
