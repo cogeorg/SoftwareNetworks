@@ -9,3 +9,4 @@ Code that generates figures, tables, and outputs for the manuscript.
 ## Conventions
 - Keep changes minimal and localized.
 - Document any new scripts or flags you add.
+- Use concise colored step markers in shell scripts and prefer `tqdm` for long Python loops.

@@ -5,10 +5,10 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if [ "${1:-}" = "REPRO" ]; then
   base_dir="${script_dir}/../60_repro/30_data"
-  base_name="Pypi/deprecated"
+  base_name="Pypi"
   identifier="dependencies_Pypi-repo2-matched-lcc"
   depth="6"
-  manuscript_dir="${script_dir}/60_repro/outputs"
+  manuscript_dir="${script_dir}/../60_repro/outputs"
   protection_file=""
   num_protected=""
   protection_metric=""
