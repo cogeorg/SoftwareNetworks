@@ -12,21 +12,15 @@ from tqdm import tqdm
 
 _ADJ = None
 _DEPTH = None
-_PROTECTED = None
-
-
-def init_worker(adj, depth, protected):
-    global _ADJ, _DEPTH, _PROTECTED
+def init_worker(adj, depth):
+    global _ADJ, _DEPTH
     _ADJ = adj
     _DEPTH = depth
-    _PROTECTED = protected
 
 
 def kstep_counts(seed):
     adj = _ADJ
     depth = _DEPTH
-    if _PROTECTED and seed in _PROTECTED:
-        return [0] * depth
     visited = {seed}
     frontier = [seed]
     counts = []
@@ -102,6 +96,7 @@ def main():
             else base_directory / args.protect_file
         )
         protected = load_protected(protect_path, args.num_protected)
+        graph.remove_nodes_from(protected)
 
     nodes = list(graph.nodes())
     if not nodes:
@@ -119,7 +114,7 @@ def main():
         max_workers=args.workers,
         mp_context=ctx,
         initializer=init_worker,
-        initargs=(adj, args.depth, protected),
+        initargs=(adj, args.depth),
     ) as executor:
         with output_path.open("w") as handle:
             for run_id, counts in enumerate(
