@@ -96,12 +96,18 @@ def main():
         action="store_true",
         help="Skip percent levels if required files are missing.",
     )
+    parser.add_argument(
+        "--suffix",
+        default="",
+        help="Suffix appended to CSV filenames before .csv (e.g. '_lam0.5').",
+    )
     args = parser.parse_args()
 
     data_dir = Path(args.data_dir)
     out_dir = Path(args.out_dir) if args.out_dir else data_dir
 
-    baseline_path = data_dir / f"importance_{args.identifier}-{args.depth}.csv"
+    sfx = args.suffix
+    baseline_path = data_dir / f"importance_{args.identifier}-{args.depth}{sfx}.csv"
     if not baseline_path.exists():
         raise FileNotFoundError(baseline_path)
 
@@ -139,9 +145,9 @@ def main():
     if args.top_counts:
         top_counts = [int(p.strip()) for p in args.top_counts.split(",") if p.strip()]
         for k in top_counts:
-            indeg_path = data_dir / f"importance_{args.identifier}-{k}-{args.depth}_indeg.csv"
-            ef_path = data_dir / f"importance_{args.identifier}-{k}-{args.depth}_ef.csv"
-            betef_path = data_dir / f"importance_{args.identifier}-{k}-{args.depth}_betef.csv"
+            indeg_path = data_dir / f"importance_{args.identifier}-{k}-{args.depth}_indeg{sfx}.csv"
+            ef_path = data_dir / f"importance_{args.identifier}-{k}-{args.depth}_ef{sfx}.csv"
+            betef_path = data_dir / f"importance_{args.identifier}-{k}-{args.depth}_betef{sfx}.csv"
             missing = [p for p in (indeg_path, ef_path, betef_path) if not p.exists()]
             if missing:
                 if args.skip_missing:
@@ -163,7 +169,7 @@ def main():
                 "betef": dict(zip(("mean", "std"), betef_stats)),
             }
 
-            out_file = out_dir / f"policy_c1_top{k}.png"
+            out_file = out_dir / f"policy_c1_top{k}{sfx}.png"
             plot_policy(
                 steps,
                 series,
@@ -175,9 +181,9 @@ def main():
         percents = [int(p.strip()) for p in args.percents.split(",") if p.strip()]
         for pct in percents:
             k = percent_to_k(n_nodes, pct)
-            indeg_path = data_dir / f"importance_{args.identifier}-{k}-{args.depth}_indeg.csv"
-            ef_path = data_dir / f"importance_{args.identifier}-{k}-{args.depth}_ef.csv"
-            betef_path = data_dir / f"importance_{args.identifier}-{k}-{args.depth}_betef.csv"
+            indeg_path = data_dir / f"importance_{args.identifier}-{k}-{args.depth}_indeg{sfx}.csv"
+            ef_path = data_dir / f"importance_{args.identifier}-{k}-{args.depth}_ef{sfx}.csv"
+            betef_path = data_dir / f"importance_{args.identifier}-{k}-{args.depth}_betef{sfx}.csv"
             missing = [p for p in (indeg_path, ef_path, betef_path) if not p.exists()]
             if missing:
                 if args.skip_missing:
@@ -199,7 +205,7 @@ def main():
                 "betef": dict(zip(("mean", "std"), betef_stats)),
             }
 
-            out_file = out_dir / f"policy_c1_{pct}pct.png"
+            out_file = out_dir / f"policy_c1_{pct}pct{sfx}.png"
             plot_policy(
                 steps,
                 series,

@@ -12,29 +12,60 @@ from tqdm import tqdm
 
 _ADJ = None
 _DEPTH = None
-def init_worker(adj, depth):
-    global _ADJ, _DEPTH
+_LAM = None
+
+
+def init_worker(adj, depth, lam):
+    global _ADJ, _DEPTH, _LAM
     _ADJ = adj
     _DEPTH = depth
+    _LAM = lam
 
 
-def kstep_counts(seed):
+def kstep_counts(args):
+    """BFS contagion from a single seed node.
+
+    *args* is a tuple ``(seed_node, run_seed)`` where *run_seed* is used
+    to initialise a per-run RNG for probabilistic transmission (lam < 1).
+    When lam >= 1.0 the RNG is never consulted and transmission is
+    deterministic.
+    """
+    seed_node, run_seed = args
     adj = _ADJ
     depth = _DEPTH
-    visited = {seed}
-    frontier = [seed]
+    lam = _LAM
+
+    visited = {seed_node}
+    frontier = [seed_node]
     counts = []
-    for _ in range(depth):
-        counts.append(len(visited))
-        if not frontier:
-            continue
-        next_frontier = []
-        for node in frontier:
-            for nbr in adj.get(node, ()):
-                if nbr not in visited:
-                    visited.add(nbr)
-                    next_frontier.append(nbr)
-        frontier = next_frontier
+
+    if lam >= 1.0:
+        # Fast deterministic path (original behaviour)
+        for _ in range(depth):
+            counts.append(len(visited))
+            if not frontier:
+                continue
+            next_frontier = []
+            for node in frontier:
+                for nbr in adj.get(node, ()):
+                    if nbr not in visited:
+                        visited.add(nbr)
+                        next_frontier.append(nbr)
+            frontier = next_frontier
+    else:
+        rng = random.Random(run_seed)
+        for _ in range(depth):
+            counts.append(len(visited))
+            if not frontier:
+                continue
+            next_frontier = []
+            for node in frontier:
+                for nbr in adj.get(node, ()):
+                    if nbr not in visited and rng.random() < lam:
+                        visited.add(nbr)
+                        next_frontier.append(nbr)
+            frontier = next_frontier
+
     return counts
 
 
@@ -50,6 +81,17 @@ def load_protected(path: Path, num_protected: int):
     return set(protected)
 
 
+def load_seed_file(path: Path):
+    """Read seed node IDs from a file (one per line)."""
+    seeds = []
+    with path.open("r") as handle:
+        for line in handle:
+            node = line.strip()
+            if node:
+                seeds.append(node)
+    return seeds
+
+
 def parse_args():
     parser = argparse.ArgumentParser(
         description="Sample contagion runs and write importance-style CSV."
@@ -60,6 +102,18 @@ def parse_args():
     parser.add_argument("--runs", type=int, default=1024)
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument(
+        "--seed-file",
+        default=None,
+        help="File with pre-generated seed node IDs (one per line). "
+        "Seeds not present in the (possibly protected) graph are skipped.",
+    )
+    parser.add_argument(
+        "--lam",
+        type=float,
+        default=1.0,
+        help="Transmission probability per edge (default: 1.0 = deterministic).",
+    )
     parser.add_argument("--protect-file", default=None)
     parser.add_argument("--num-protected", type=int, default=None)
     parser.add_argument("--protect-label", default=None)
@@ -101,9 +155,33 @@ def main():
     nodes = list(graph.nodes())
     if not nodes:
         raise RuntimeError("Graph has no nodes after protection.")
+    node_set = set(nodes)
 
-    rng = random.Random(args.seed)
-    seeds = [rng.choice(nodes) for _ in range(args.runs)]
+    # Build seed list -------------------------------------------------
+    if args.seed_file:
+        seed_file_path = (
+            Path(args.seed_file)
+            if os.path.isabs(args.seed_file)
+            else base_directory / args.seed_file
+        )
+        all_seeds = load_seed_file(seed_file_path)
+        # Keep only seeds that are present in the (possibly protected) graph
+        seeds = [s for s in all_seeds if s in node_set]
+        if not seeds:
+            raise RuntimeError(
+                f"No seeds from {seed_file_path} are present in the graph "
+                f"(after protection). Check that node IDs match."
+            )
+        print(f"Loaded {len(seeds)} seeds from {seed_file_path} "
+              f"({len(all_seeds) - len(seeds)} skipped as absent/protected)")
+    else:
+        rng = random.Random(args.seed)
+        seeds = [rng.choice(nodes) for _ in range(args.runs)]
+
+    # Per-run RNG seeds for probabilistic transmission ----------------
+    master_rng = random.Random(args.seed)
+    run_seeds = [master_rng.randint(0, 2**63) for _ in range(len(seeds))]
+    work_items = list(zip(seeds, run_seeds))
 
     adj = {node: list(graph.successors(node)) for node in nodes}
 
@@ -114,11 +192,11 @@ def main():
         max_workers=args.workers,
         mp_context=ctx,
         initializer=init_worker,
-        initargs=(adj, args.depth),
+        initargs=(adj, args.depth, args.lam),
     ) as executor:
         with output_path.open("w") as handle:
             for run_id, counts in enumerate(
-                tqdm(executor.map(kstep_counts, seeds), total=len(seeds), desc="runs", mininterval=1.0)
+                tqdm(executor.map(kstep_counts, work_items), total=len(work_items), desc="runs", mininterval=1.0)
             ):
                 handle.write(str(run_id))
                 for value in counts:
