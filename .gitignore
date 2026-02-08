@@ -6,3 +6,5 @@ OSLOM2/.DS_Store
 *.stswp
 .DS_Store
 60_repro/
+__pycache__/
+*.pyc
